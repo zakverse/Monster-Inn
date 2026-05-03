@@ -11,4 +11,9 @@ public class HomeController {
         return "modules/home/home";
     }
 
+    @GetMapping("/dashboard")
+    public String showDashboard() {
+        return "modules/dashboard/dashboard";
+    }
+
 }
