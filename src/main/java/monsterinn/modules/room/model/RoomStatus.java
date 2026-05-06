@@ -15,5 +15,6 @@ public enum RoomStatus {
     RoomStatus(String label, String cssClass) {
         this.label = label;
         this.cssClass = cssClass;
+        
     }
 }
