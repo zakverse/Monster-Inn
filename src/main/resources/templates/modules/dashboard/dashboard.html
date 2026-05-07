@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=IM+Fell+English&display=swap" rel="stylesheet">
+    <title>Dashboard — Monster Inn</title>
+    <style>
+        :root {
+            --bg: #050402; --cave: #0d0906; --gold: #c08800; --parch: #f0ddb0;
+        }
+        body { background: var(--bg); color: var(--parch); font-family: 'IM Fell English', serif; }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .sidebar-link.active { background: #181210; border-left: 4px solid var(--gold); color: var(--gold); }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-[#0d0906] border-r border-[#3a2c1c] flex flex-col justify-between shrink-0 h-screen sticky top-0">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-10 h-10 border border-[#c08800] rounded-lg flex items-center justify-center text-[#c08800] font-bold text-xl">M</div>
+                <div>
+                    <h1 class="font-cinzel text-sm font-bold text-[#f9c038] tracking-widest">MONSTER INN</h1>
+                    <p class="text-[9px] text-[#a08860] uppercase">Front Desk Cave</p>
+                </div>
+            </div>
+
+            <nav class="space-y-2">
+                <a href="dashboard.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition">
+                    <i class="fa-solid fa-chess-rook w-5"></i> Dashboard
+                </a>
+                <a href="registrasi.html" class="flex items-center gap-3 px-4 py-3 text-[#a08860] hover:text-[#f0ddb0] hover:bg-[#181210] rounded-lg text-sm transition">
+                    <i class="fa-solid fa-scroll w-5"></i> Registrasi Tamu
+                </a>
+                <a href="status.html" class="flex items-center gap-3 px-4 py-3 text-[#a08860] hover:text-[#f0ddb0] hover:bg-[#181210] rounded-lg text-sm transition">
+                    <i class="fa-solid fa-door-open w-5"></i> Status Kamar
+                </a>
+                <a href="layanan.html" class="flex items-center gap-3 px-4 py-3 text-[#a08860] hover:text-[#f0ddb0] hover:bg-[#181210] rounded-lg text-sm transition">
+                    <i class="fa-solid fa-flask-vial w-5"></i> Layanan
+                </a>
+                <a href="checkout.html" class="flex items-center gap-3 px-4 py-3 text-[#a08860] hover:text-[#f0ddb0] hover:bg-[#181210] rounded-lg text-sm transition">
+                    <i class="fa-solid fa-coins w-5"></i> Checkout & Tagihan
+                </a>
+                <a href="laporan.html" class="flex items-center gap-3 px-4 py-3 text-[#a08860] hover:text-[#f0ddb0] hover:bg-[#181210] rounded-lg text-sm transition">
+                    <i class="fa-solid fa-file-lines w-5"></i> Laporan Harian
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-6 border-t border-[#3a2c1c] bg-[#050402]/50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#c08800] rounded-full flex items-center justify-center text-[#050402] font-bold">R</div>
+                <div>
+                    <p class="text-[#f0ddb0] text-xs font-bold font-cinzel">Resepsionis</p>
+                    <p class="text-[9px] text-[#a08860] uppercase">Shift Malam</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-8">
+        <header class="mb-10 flex justify-between items-end">
+            <div>
+                <h2 class="font-cinzel text-3xl font-bold text-[#f9c038]">Overview Gua</h2>
+                <p class="text-[#a08860] text-sm italic">Selamat datang di meja kasir batu Anda.</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] text-[#c08800] font-bold uppercase tracking-widest">Waktu Isekai</p>
+                <p class="font-cinzel text-lg">28 April 2026</p>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-4 gap-6 mb-10">
+            <div class="bg-[#0d0906] p-6 rounded-2xl border border-[#3a2c1c] shadow-lg">
+                <p class="text-[10px] font-bold text-[#a08860] uppercase mb-1">Total Kamar</p>
+                <p class="font-cinzel text-3xl font-bold text-[#f0ddb0]">9</p>
+            </div>
+            <div class="bg-[#0d0906] p-6 rounded-2xl border border-emerald-900/30 shadow-lg">
+                <p class="text-[10px] font-bold text-emerald-500 uppercase mb-1">Tersedia</p>
+                <p class="font-cinzel text-3xl font-bold text-emerald-400">5</p>
+            </div>
+            <div class="bg-[#0d0906] p-6 rounded-2xl border border-red-900/30 shadow-lg">
+                <p class="text-[10px] font-bold text-red-500 uppercase mb-1">Terisi</p>
+                <p class="font-cinzel text-3xl font-bold text-red-400">3</p>
+            </div>
+            <div class="bg-[#0d0906] p-6 rounded-2xl border border-orange-900/30 shadow-lg">
+                <p class="text-[10px] font-bold text-[#c08800] uppercase mb-1">Perawatan</p>
+                <p class="font-cinzel text-3xl font-bold text-[#f9c038]">1</p>
+            </div>
+        </div>
+
+        <!-- Section Analisis Pendapatan (Elemen) -->
+        <h3 class="font-cinzel text-xl text-[#f9c038] mb-6">Analisis Elemen</h3>
+        <div class="grid grid-cols-3 gap-6 mb-10">
+            <div class="bg-[#181210] p-6 rounded-2xl border border-orange-900/20">
+                <div class="flex justify-between mb-4">
+                    <span class="text-xs font-bold text-orange-500 uppercase">Api</span>
+                    <span class="font-bold">Rp 7.3jt</span>
+                </div>
+                <div class="w-full bg-[#050402] h-1 rounded-full overflow-hidden">
+                    <div class="bg-orange-500 h-full" style="width: 31%"></div>
+                </div>
+            </div>
+            <div class="bg-[#181210] p-6 rounded-2xl border border-blue-900/20">
+                <div class="flex justify-between mb-4">
+                    <span class="text-xs font-bold text-blue-400 uppercase">Air</span>
+                    <span class="font-bold">Rp 7.2jt</span>
+                </div>
+                <div class="w-full bg-[#050402] h-1 rounded-full overflow-hidden">
+                    <div class="bg-blue-400 h-full" style="width: 31%"></div>
+                </div>
+            </div>
+            <div class="bg-[#181210] p-6 rounded-2xl border border-emerald-900/20">
+                <div class="flex justify-between mb-4">
+                    <span class="text-xs font-bold text-emerald-500 uppercase">Tanah</span>
+                    <span class="font-bold">Rp 8.4jt</span>
+                </div>
+                <div class="w-full bg-[#050402] h-1 rounded-full overflow-hidden">
+                    <div class="bg-emerald-500 h-full" style="width: 38%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Tamu Terkini -->
+        <div class="bg-[#0d0906] rounded-2xl border border-[#3a2c1c] overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-[#181210] text-[#a08860] uppercase text-[10px] tracking-widest">
+                    <tr>
+                        <th class="px-6 py-4">Nama Tamu</th>
+                        <th class="px-6 py-4">Elemen</th>
+                        <th class="px-6 py-4">No. Kamar</th>
+                        <th class="px-6 py-4 text-right">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#3a2c1c] text-xs">
+                    <tr class="hover:bg-[#181210] transition">
+                        <td class="px-6 py-4 font-bold">Ember Blaze</td>
+                        <td class="px-6 py-4 text-orange-500">Fire</td>
+                        <td class="px-6 py-4 text-[#a08860]">102</td>
+                        <td class="px-6 py-4 text-right"><span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full">Aktif</span></td>
+                    </tr>
+                    <tr class="hover:bg-[#181210] transition">
+                        <td class="px-6 py-4 font-bold">Wade Ripple</td>
+                        <td class="px-6 py-4 text-blue-400">Water</td>
+                        <td class="px-6 py-4 text-[#a08860]">202</td>
+                        <td class="px-6 py-4 text-right"><span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full">Aktif</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>
