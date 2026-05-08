@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <title>Laporan Harian — Monster Inn</title>
+    <style>
+        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; }
+        .pixel-card { background: #1e1825; border: 4px solid #3a2e28; box-shadow: 6px 6px 0px #000; }
+        .text-pixel { font-family: 'Press Start 2P', monospace; }
+        .text-retro { font-family: 'VT323', monospace; }
+        
+        .bar-container { background: #3a2e28; border: 2px solid #000; height: 20px; width: 100%; position: relative; }
+        .bar-fill { height: 100%; background: #d4a94a; box-shadow: inset 0 2px 0 rgba(255,255,255,0.3); }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- IMPORT SIDEBAR[cite: 1] -->
+    <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <header class="mb-10 border-b-4 border-[#3a2e28] pb-6 flex justify-between items-end">
+            <div>
+                <div class="text-[#c08800] text-xs text-pixel mb-2 uppercase">✦ Rekapitulasi Operasional</div>
+                <h2 class="text-pixel text-xl text-[#ffd96b]">LAPORAN HARIAN</h2>
+                <p class="text-retro text-xl text-[#9c7ac4] mt-1 italic">Analisis performa penginapan antar-dimensi.</p>
+            </div>
+            <button class="bg-[#85a67a] border-4 border-[#3a2e28] text-[#3a2e28] px-6 py-2 text-pixel text-[8px] shadow-[4px_4px_0px_#000] hover:bg-[#b5d4a8]">
+                EXPORT DATA
+            </button>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-3 gap-8 mb-10">
+            <div class="pixel-card p-6 border-b-4 border-b-[#ffd96b]">
+                <p class="text-pixel text-[7px] text-[#9c7ac4] mb-3 uppercase">Pendapatan Emas</p>
+                <p class="text-retro text-3xl text-[#ffd96b] font-bold">Rp 1.450.000</p>
+            </div>
+            <div class="pixel-card p-6 border-b-4 border-b-[#6ba3c5]">
+                <p class="text-pixel text-[7px] text-[#9c7ac4] mb-3 uppercase">Total Transaksi</p>
+                <p class="text-retro text-3xl text-[#6ba3c5] font-bold">12 Order</p>
+            </div>
+            <div class="pixel-card p-6 border-b-4 border-b-[#e8734a]">
+                <p class="text-pixel text-[7px] text-[#9c7ac4] mb-3 uppercase">Tamu Terlayani</p>
+                <p class="text-retro text-3xl text-[#e8734a] font-bold">08 Monster</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8">
+            <!-- Statistik Elemen -->
+            <div class="pixel-card p-8">
+                <h3 class="text-pixel text-[9px] mb-8 text-[#ffd96b] uppercase">Populeritas Elemen</h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-retro text-xl mb-1"><span>Klan Api</span> <span>45%</span></div>
+                        <div class="bar-container"><div class="bar-fill" style="width: 45%; background: #e8734a;"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-retro text-xl mb-1"><span>Klan Air</span> <span>30%</span></div>
+                        <div class="bar-container"><div class="bar-fill" style="width: 30%; background: #6ba3c5;"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-retro text-xl mb-1"><span>Klan Tanah</span> <span>25%</span></div>
+                        <div class="bar-container"><div class="bar-fill" style="width: 25%; background: #85a67a;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Aktivitas Terakhir -->
+            <div class="pixel-card p-8">
+                <h3 class="text-pixel text-[9px] mb-8 text-[#ffd96b] uppercase">Log Aktivitas Terbaru</h3>
+                <div class="space-y-4 text-retro text-lg">
+                    <div class="flex gap-4 border-l-4 border-[#85a67a] pl-4">
+                        <span class="text-[#9c7ac4]">18:00</span>
+                        <span>Check-out Berhasil: Ember Blaze</span>
+                    </div>
+                    <div class="flex gap-4 border-l-4 border-[#6ba3c5] pl-4">
+                        <span class="text-[#9c7ac4]">17:45</span>
+                        <span>Layanan Baru: Wade Ripple - Abyss Mist</span>
+                    </div>
+                    <div class="flex gap-4 border-l-4 border-[#e8734a] pl-4">
+                        <span class="text-[#9c7ac4]">16:20</span>
+                        <span>Registrasi Gagal: No Room Available (#101)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

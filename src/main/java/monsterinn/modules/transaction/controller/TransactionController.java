@@ -4,17 +4,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/transaction")
+//@RequestMapping("/transaction") 
 public class TransactionController {
 
     @GetMapping("/checkout")
     public String showCheckoutPage() {
         // Asumsi UI HTML bernama checkout.html sudah disiapkan oleh Front-end
-        return "modules/dashboard/checkout"; 
+        return "modules/transaction/checkout"; 
     }
 
     @PostMapping("/process")
@@ -35,7 +35,7 @@ public class TransactionController {
 
         } catch (Exception e) {
             model.addAttribute("error", "Terjadi kesalahan saat memproses pembayaran.");
-            return "modules/dashboard/checkout";
+            return "modules/transaction/checkout";
         }
     }
 }
