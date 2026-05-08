@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+    <!-- Definisi Fragment Sidebar -->
+    <aside th:fragment="monster-sidebar" 
+           class="w-64 bg-[#1e1825] border-r-4 border-[#3a2e28] flex flex-col justify-between shrink-0 h-screen sticky top-0 font-['Pixelify_Sans']">
+        
+        <div class="p-6">
+            <!-- Logo Header Pixel -->
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-10 h-10 border-2 border-[#ffd96b] bg-[#0f0b14] flex items-center justify-center text-[#ffd96b] font-bold text-xl shadow-[4px_4px_0px_#000]">
+                    M
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-[#ffd96b] tracking-widest leading-none">MONSTER INN</h1>
+                    <p class="text-[9px] text-[#9c7ac4] uppercase mt-1">Pixel Front Desk</p>
+                </div>
+            </div>
+
+            <!-- Navigation Menu dengan Route yang sudah diarahkan -->
+            <nav class="space-y-2 text-[#f4e8d0] text-sm">
+                <!-- Dashboard -->
+                <a th:href="@{/dashboard}" 
+                   class="flex items-center gap-3 px-4 py-3 border-2 border-transparent transition-all group"
+                   th:classappend="${activePage == 'dashboard' ? 'bg-[#3a2e28] border-[#ffd96b] text-[#ffd96b] shadow-[4px_4px_0px_rgba(0,0,0,0.5)]' : 'hover:bg-[#3a2e28]/50 hover:text-[#ffd96b]'}">
+                    <i class="fa-solid fa-chess-rook w-5"></i> <span>Dashboard</span>
+                </a>
+                
+                <!-- Registrasi Tamu -->
+                <a th:href="@{/registrasi}" 
+                   class="flex items-center gap-3 px-4 py-3 border-2 border-transparent transition-all group"
+                   th:classappend="${activePage == 'registrasi' ? 'bg-[#3a2e28] border-[#ffd96b] text-[#ffd96b] shadow-[4px_4px_0px_rgba(0,0,0,0.5)]' : 'hover:bg-[#3a2e28]/50 hover:text-[#ffd96b]'}">
+                    <i class="fa-solid fa-scroll w-5"></i> <span>Registrasi Tamu</span>
+                </a>
+
+                <!-- Status Kamar -->
+                <a th:href="@{/room}" 
+                   class="flex items-center gap-3 px-4 py-3 border-2 border-transparent transition-all group"
+                   th:classappend="${activePage == 'status' ? 'bg-[#3a2e28] border-[#ffd96b] text-[#ffd96b] shadow-[4px_4px_0px_rgba(0,0,0,0.5)]' : 'hover:bg-[#3a2e28]/50 hover:text-[#ffd96b]'}">
+                    <i class="fa-solid fa-door-open w-5"></i> <span>Status Kamar</span>
+                </a>
+
+                <!-- Layanan -->
+                <a th:href="@{/service}" 
+                   class="flex items-center gap-3 px-4 py-3 border-2 border-transparent transition-all group"
+                   th:classappend="${activePage == 'layanan' ? 'bg-[#3a2e28] border-[#ffd96b] text-[#ffd96b] shadow-[4px_4px_0px_rgba(0,0,0,0.5)]' : 'hover:bg-[#3a2e28]/50 hover:text-[#ffd96b]'}">
+                    <i class="fa-solid fa-flask-vial w-5"></i> <span>Layanan</span>
+                </a>
+
+                <!-- Checkout & Tagihan -->
+                <a th:href="@{/checkout}" 
+                   class="flex items-center gap-3 px-4 py-3 border-2 border-transparent transition-all group"
+                   th:classappend="${activePage == 'checkout' ? 'bg-[#3a2e28] border-[#ffd96b] text-[#ffd96b] shadow-[4px_4px_0px_rgba(0,0,0,0.5)]' : 'hover:bg-[#3a2e28]/50 hover:text-[#ffd96b]'}">
+                    <i class="fa-solid fa-coins w-5"></i> <span>Checkout & Tagihan</span>
+                </a>
+
+                <!-- Laporan Harian -->
+                <a th:href="@{/laporan}" 
+                   class="flex items-center gap-3 px-4 py-3 border-2 border-transparent transition-all group"
+                   th:classappend="${activePage == 'laporan' ? 'bg-[#3a2e28] border-[#ffd96b] text-[#ffd96b] shadow-[4px_4px_0px_rgba(0,0,0,0.5)]' : 'hover:bg-[#3a2e28]/50 hover:text-[#ffd96b]'}">
+                    <i class="fa-solid fa-file-lines w-5"></i> <span>Laporan Harian</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Info Resepsionis -->
+        <div class="p-6 border-t-4 border-[#3a2e28] bg-[#0f0b14]/50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#d4a94a] border-2 border-[#000] flex items-center justify-center text-[#0f0b14] font-bold">R</div>
+                <div>
+                    <p class="text-[#f4e8d0] text-xs font-bold uppercase">Resepsionis</p>
+                    <p class="text-[9px] text-[#9c7ac4] uppercase tracking-tighter">Night Shift</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+</body>
+</html>
