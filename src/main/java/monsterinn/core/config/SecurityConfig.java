@@ -19,19 +19,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests((requests) -> requests
-                // Izinkan akses tanpa login untuk landing page dan assets
-                .requestMatchers("/", "/css/**", "/js/**", "/images/**").permitAll() 
-                // Sisanya (Dashboard, dll) WAJIB login
-                .anyRequest().authenticated()
-            )
-            .formLogin((form) -> form
-                .loginPage("/login") // Route ke halaman login buatan kita
-                .defaultSuccessUrl("/dashboard", true) // Jika sukses, lempar ke dashboard
-                .permitAll()
-            )
-            .logout((logout) -> logout.permitAll());
-
+            .csrf(csrf -> csrf.disable()) // Matikan CSRF sementara agar POST login tidak diblokir
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login", "/css/**", "/js/**").permitAll() // Izinkan halaman login
+                .anyRequest().permitAll() // Izinkan halaman lain sementara waktu
+            );
         return http.build();
     }
 

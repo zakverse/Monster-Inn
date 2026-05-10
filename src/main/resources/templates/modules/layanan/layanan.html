@@ -18,14 +18,27 @@
 
         .service-item { border: 3px solid #3a2e28; transition: all 0.2s; }
         .service-item:hover { border-color: #ffd96b; transform: scale(1.02); }
+<<<<<<< HEAD
+=======
+
+        /* Custom Scrollbar Pixel Style */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0f0b14; }
+        ::-webkit-scrollbar-thumb { background: #3a2e28; border: 2px solid #0f0b14; }
+>>>>>>> 81d627949eb2ae7d61a1f69c791d8685e78e709a
     </style>
 </head>
 <body class="flex min-h-screen">
 
+<<<<<<< HEAD
     <!-- IMPORT SIDEBAR[cite: 1] -->
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
     <!-- MAIN CONTENT -->
+=======
+    <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
+
+>>>>>>> 81d627949eb2ae7d61a1f69c791d8685e78e709a
     <main class="flex-1 p-8 overflow-y-auto">
         <header class="mb-10 border-b-4 border-[#3a2e28] pb-6">
             <div class="text-[#c08800] text-xs text-pixel mb-2">✦ PERAWATAN SPESIFIK</div>
@@ -34,12 +47,16 @@
         </header>
 
         <div class="grid grid-cols-12 gap-8">
+<<<<<<< HEAD
             <!-- Seleksi Tamu -->
+=======
+>>>>>>> 81d627949eb2ae7d61a1f69c791d8685e78e709a
             <div class="col-span-4 space-y-6">
                 <div class="pixel-card p-6">
                     <label class="text-pixel text-[8px] text-[#ffd96b] block mb-4 uppercase">Pilih Tamu Aktif</label>
                     <select id="guest-select" onchange="updateServices()" class="pixel-input w-full px-4 py-3 text-retro text-2xl appearance-none cursor-pointer">
                         <option value="">Pilih dari daftar...</option>
+<<<<<<< HEAD
                         <option value="fire">Ember Blaze (#102)</option>
                         <option value="water">Wade Ripple (#202)</option>
                     </select>
@@ -52,6 +69,23 @@
             </div>
 
             <!-- Daftar Layanan -->
+=======
+                        <option th:each="g : ${activeGuests}" 
+                                th:value="${g.idMonster}" 
+                                th:data-room="${g.roomId}"
+                                th:data-element="${g.getElement()}"
+                                th:text="${g.name + ' (#' + g.roomId + ')'}">
+                        </option>
+                    </select>
+                </div>
+
+                <div id="summary-box" class="pixel-card p-6 hidden text-center">
+                    <p class="text-pixel text-[7px] text-[#9c7ac4] mb-4 uppercase">Status Kamar</p>
+                    <div id="room-info" class="text-retro text-2xl text-[#ffd96b]"></div>
+                </div>
+            </div>
+
+>>>>>>> 81d627949eb2ae7d61a1f69c791d8685e78e709a
             <div class="col-span-8">
                 <div id="service-container" class="grid grid-cols-1 gap-4">
                     <div class="pixel-card p-20 text-center opacity-50">
@@ -64,6 +98,7 @@
     </main>
 
     <script>
+<<<<<<< HEAD
         const services = {
             fire: [
                 { name: "Magma Injection", price: 60000, icon: "fa-fire", color: "#e8734a" },
@@ -72,21 +107,65 @@
             water: [
                 { name: "Aquatic Nutrient", price: 70000, icon: "fa-droplet", color: "#6ba3c5" },
                 { name: "Deep Sea Mist", price: 45000, icon: "fa-cloud-showers-heavy", color: "#6ba3c5" }
+=======
+        // Data menu (Bisa dipindah ke Database nantinya)
+        const serviceMenu = {
+            'Api': [
+                { name: "Magma Injection", price: 60000, icon: "fa-fire", color: "#e8734a" },
+                { name: "Lava Bath", price: 75000, icon: "fa-hot-tub-person", color: "#e8734a" }
+            ],
+            'Air': [
+                { name: "Aquatic Nutrient", price: 70000, icon: "fa-droplet", color: "#6ba3c5" },
+                { name: "Deep Sea Mist", price: 45000, icon: "fa-cloud-showers-heavy", color: "#6ba3c5" }
+            ],
+            'Tanah': [
+                { name: "Soil Nutrient", price: 50000, icon: "fa-leaf", color: "#8a9a5b" },
+                { name: "Root Massage", price: 40000, icon: "fa-hand-holding-droplet", color: "#8a9a5b" }
+>>>>>>> 81d627949eb2ae7d61a1f69c791d8685e78e709a
             ]
         };
 
         function updateServices() {
+<<<<<<< HEAD
             const el = document.getElementById('guest-select').value;
             const container = document.getElementById('service-container');
             const summary = document.getElementById('summary-box');
             
             if(!el) { 
                 summary.classList.add('hidden');
+=======
+            const select = document.getElementById('guest-select');
+            const selectedOption = select.options[select.selectedIndex];
+            const container = document.getElementById('service-container');
+            const summary = document.getElementById('summary-box');
+            const roomInfo = document.getElementById('room-info');
+            
+            const element = selectedOption.getAttribute('data-element');
+            const roomId = selectedOption.getAttribute('data-room');
+
+            if(!element) { 
+                summary.classList.add('hidden');
+                container.innerHTML = `<div class="pixel-card p-20 text-center opacity-50"><i class="fa-solid fa-mortar-pestle text-5xl mb-4 text-[#3a2e28]"></i><p class="text-pixel text-[8px]">Menunggu Seleksi Tamu...</p></div>`;
+>>>>>>> 81d627949eb2ae7d61a1f69c791d8685e78e709a
                 return; 
             }
 
             summary.classList.remove('hidden');
+<<<<<<< HEAD
             container.innerHTML = services[el].map(s => `
+=======
+            roomInfo.innerText = "KAMAR #" + roomId + " (" + element + ")";
+
+            // Render menu berdasarkan elemen monster
+            const availableServices = serviceMenu[element] || [];
+            
+            if(availableServices.length === 0) {
+                container.innerHTML = `<div class="pixel-card p-10 text-center text-retro text-2xl">Tidak ada layanan khusus untuk elemen ini.</div>`;
+                return;
+            }
+
+            container.innerHTML = availableServices.map(s => `
+>>>>>>> 81d627949eb2ae7d61a1f69c791d8685e78e709a
                 <div class="service-item bg-[#1e1825] p-6 flex justify-between items-center">
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 border-2 border-[#3a2e28] flex items-center justify-center" style="color: ${s.color}">
@@ -94,6 +173,7 @@
                         </div>
                         <div>
                             <h4 class="text-retro text-2xl font-bold">${s.name}</h4>
+<<<<<<< HEAD
                             <p class="text-retro text-lg text-[#9c7ac4]">Tarif: Rp ${s.price.toLocaleString()}</p>
                         </div>
                     </div>
@@ -101,6 +181,47 @@
                 </div>
             `).join('');
         }
+=======
+                            <p class="text-retro text-lg text-[#9c7ac4]">Tarif: Rp ${s.price.toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                    <button onclick="orderService('${select.value}', '${roomId}', '${s.name}', ${s.price})" 
+                            class="px-4 py-2 bg-[#d4a94a] border-2 border-[#3a2e28] text-pixel text-[7px] hover:bg-[#ffd96b] shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none transition-all">
+                        TAMBAH
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // FUNGSI KIRIM KE BACKEND (POST)
+        async function orderService(guestId, roomId, serviceName, price) {
+            const data = {
+                guestId: guestId,
+                roomId: roomId,
+                orderName: serviceName,
+                rate: price
+            };
+
+            try {
+                const response = await fetch('/service/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.text();
+                
+                if (response.ok) {
+                    alert("✦ BERHASIL: " + serviceName + " ditambahkan ke tagihan tamu! ✦");
+                } else {
+                    alert("Gagal: " + result);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Terjadi kesalahan sistem!");
+            }
+        }
+>>>>>>> 81d627949eb2ae7d61a1f69c791d8685e78e709a
     </script>
 </body>
 </html>

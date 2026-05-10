@@ -1,18 +1,13 @@
 package monsterinn.modules.report.controller;
-
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;  
 
 @Controller
-@RequestMapping("/laporan")
 public class ReportController {
-
-    @GetMapping
-    public String showReportPage(Model model) {
-        // Mengaktifkan menu 'Laporan' di sidebar
-        model.addAttribute("activePage", "laporan");
-        return "modules/report/laporan";
+    @GetMapping("/laporan")
+    public String showReportPage() {
+        // Asumsi UI HTML bernama report.html sudah disiapkan oleh Front-end
+        return "modules/report/laporan"; 
     }
+    
 }
