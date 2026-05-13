@@ -5,33 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Font Pixel dari Landing Page -->
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <title>Pixel Dashboard — Monster Inn</title>
     <style>
-        body { 
-            background: #0f0b14; 
-            color: #f4e8d0; 
-            font-family: 'Pixelify Sans', sans-serif; 
-            image-rendering: pixelated; 
-        }
-        .pixel-card { 
-            background: #1e1825; 
-            border: 4px solid #3a2e28; 
-            box-shadow: 6px 6px 0px #000; 
-        }
+        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; }
+        .pixel-card { background: #1e1825; border: 4px solid #3a2e28; box-shadow: 6px 6px 0px #000; }
         .text-pixel { font-family: 'Press Start 2P', monospace; }
         .text-retro { font-family: 'VT323', monospace; }
     </style>
 </head>
 <body class="flex min-h-screen">
 
-    <!-- PEMANGGILAN SIDEBAR MENGGUNAKAN LAYOUT-->
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
     
-    <!-- MAIN CONTENT -->
     <main class="flex-1 p-8 overflow-y-auto">
-        <!-- Header Section -->
         <header class="mb-10 flex justify-between items-end border-b-4 border-[#3a2e28] pb-6">
             <div>
                 <h2 class="text-pixel text-xl text-[#ffd96b] tracking-wider uppercase">Overview Gua</h2>
@@ -43,27 +30,25 @@
             </div>
         </header>
 
-        <!-- Stats Cards ala RPG UI -->
         <div class="grid grid-cols-4 gap-6 mb-10">
             <div class="pixel-card p-6">
                 <p class="text-pixel text-[8px] text-[#9c7ac4] uppercase mb-3">Total Kamar</p>
-                <p class="text-pixel text-2xl font-bold">09</p>
+                <p class="text-pixel text-2xl font-bold" th:text="${totalKamar}">00</p>
             </div>
             <div class="pixel-card p-6 border-b-4 border-b-[#85a67a]">
                 <p class="text-pixel text-[8px] text-[#85a67a] uppercase mb-3">Tersedia</p>
-                <p class="text-pixel text-2xl text-[#b5d4a8]">05</p>
+                <p class="text-pixel text-2xl text-[#b5d4a8]" th:text="${tersedia}">00</p>
             </div>
             <div class="pixel-card p-6 border-b-4 border-b-[#e8734a]">
                 <p class="text-pixel text-[8px] text-[#e8734a] uppercase mb-3">Terisi</p>
-                <p class="text-pixel text-2xl text-[#ffb570]">03</p>
+                <p class="text-pixel text-2xl text-[#ffb570]" th:text="${terisi}">00</p>
             </div>
             <div class="pixel-card p-6 border-b-4 border-b-[#ffd96b]">
-                <p class="text-pixel text-[8px] text-[#ffd96b] uppercase mb-3">HP / Occupancy</p>
-                <p class="text-pixel text-xl uppercase">33.3%</p>
+                <p class="text-pixel text-[8px] text-[#ffd96b] uppercase mb-3">Occupancy Rate</p>
+                <p class="text-pixel text-xl uppercase" th:text="${occupancy}">0%</p>
             </div>
         </div>
 
-        <!-- Tabel Tamu Terkini -->
         <div class="pixel-card overflow-hidden">
             <div class="bg-[#3a2e28] p-4 border-b-4 border-[#000]">
                 <h3 class="text-pixel text-[10px] text-[#ffd96b]">PENGHUNI SAAT INI</h3>
@@ -78,21 +63,20 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y-2 divide-[#3a2c1c]">
-                    <tr class="hover:bg-[#3a2e28]/30 transition-all">
-                        <td class="px-6 py-4 font-bold text-[#f4e8d0]">Ember Blaze</td>
-                        <td class="px-6 py-4 text-[#e8734a]">FIRE</td>
-                        <td class="px-6 py-4">#102</td>
+                    <tr th:each="guest : ${activeGuests}" class="hover:bg-[#3a2e28]/30 transition-all">
+                        <td class="px-6 py-4 font-bold text-[#f4e8d0]" th:text="${guest.name}">Nama</td>
+                        <td class="px-6 py-4" 
+                            th:text="${guest.getElement()}"
+                            th:classappend="${guest.getElement() == 'FIRE' ? 'text-[#e8734a]' : (guest.getElement() == 'WATER' ? 'text-[#6ba3c5]' : 'text-[#85a67a]')}">
+                            ELEMENT
+                        </td>
+                        <td class="px-6 py-4" th:text="${guest.roomId != null ? '#' + guest.roomId : 'N/A'}">#000</td>
                         <td class="px-6 py-4 text-right">
                             <span class="px-3 py-1 bg-[#85a67a]/20 text-[#85a67a] border-2 border-[#85a67a]">ACTIVE</span>
                         </td>
                     </tr>
-                    <tr class="hover:bg-[#3a2e28]/30 transition-all">
-                        <td class="px-6 py-4 font-bold text-[#f4e8d0]">Wade Ripple</td>
-                        <td class="px-6 py-4 text-[#6ba3c5]">WATER</td>
-                        <td class="px-6 py-4">#202</td>
-                        <td class="px-6 py-4 text-right">
-                            <span class="px-3 py-1 bg-[#85a67a]/20 text-[#85a67a] border-2 border-[#85a67a]">ACTIVE</span>
-                        </td>
+                    <tr th:if="${activeGuests.empty}">
+                        <td colspan="4" class="px-6 py-10 text-center text-[#9c7ac4] italic">Tidak ada monster yang menginap saat ini...</td>
                     </tr>
                 </tbody>
             </table>

@@ -13,12 +13,11 @@
         .text-pixel { font-family: 'Press Start 2P', monospace; }
         .text-retro { font-family: 'VT323', monospace; }
         
-        /* Custom Scrollbar untuk Pixel Art */
         .pixel-scroll::-webkit-scrollbar { height: 8px; }
         .pixel-scroll::-webkit-scrollbar-track { background: #1e1825; border: 2px solid #3a2e28; }
         .pixel-scroll::-webkit-scrollbar-thumb { background: #d4a94a; border: 1px solid #000; }
         
-        .room-box { min-width: 220px; border: 4px solid #3a2e28; transition: all 0.2s; position: relative; }
+        .room-box { min-width: 240px; border: 4px solid #3a2e28; transition: all 0.2s; position: relative; }
         .room-box:hover { transform: translateY(-4px); border-color: #ffd96b; z-index: 10; }
         
         .status-tag { position: absolute; top: 0; right: 0; font-size: 8px; padding: 4px 8px; border-left: 4px solid #3a2e28; border-bottom: 4px solid #3a2e28; }
@@ -26,7 +25,6 @@
 </head>
 <body class="flex min-h-screen">
 
-    <!-- IMPORT SIDEBAR -->
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
     <main class="flex-1 p-8 overflow-x-hidden">
@@ -37,69 +35,101 @@
             </div>
             
             <div class="pixel-card p-4 flex gap-6 text-retro text-lg uppercase tracking-widest bg-[#050208]">
-                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#85a67a] border border-black"></span> Tersedia</div>
-                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#e8734a] border border-black"></span> Terisi</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#85a67a]"></span> READY</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#e8734a]"></span> TERISI</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-gray-600"></span> KOTOR</div>
             </div>
         </header>
 
-        <!-- KLAN API (7 KAMAR) -->
         <section class="mb-12">
             <h3 class="text-pixel text-[10px] text-[#e8734a] mb-6 flex items-center gap-3">
-                <i class="fa-solid fa-fire"></i> KLAN API (FIRE ZONE)
+                <i class="fa-solid fa-fire text-lg"></i> KLAN API (FIRE ZONE)
             </h3>
             <div class="flex gap-6 overflow-x-auto pb-6 pixel-scroll">
-                <!-- Gunakan th:each jika sudah ada data dari database -->
-                <div th:each="i : ${#numbers.sequence(1, 7)}" class="room-box bg-[#181210] p-5">
-                    <div class="status-tag bg-[#85a67a] text-black font-bold">READY</div>
-                    <div class="text-pixel text-[8px] text-[#3a2e28] mb-4">#10[(${i})]</div>
-                    <div class="flex justify-center my-6">
-                        <i class="fa-solid fa-volcano text-5xl text-[#3a2e28]"></i>
+                <div th:each="room : ${fireRooms}" class="room-box p-5"
+                     th:classappend="${room.status.name() == 'OCCUPIED' ? 'bg-[#2a1210] border-[#e8734a]' : (room.status.name() == 'DIRTY' ? 'bg-[#1a1a1a] opacity-70' : 'bg-[#181210]')}">
+                    
+                    <div class="status-tag font-bold" th:text="${room.status.label}"
+                         th:classappend="${room.status.name() == 'OCCUPIED' ? 'bg-[#e8734a] text-white' : (room.status.name() == 'DIRTY' ? 'bg-gray-700 text-gray-400' : 'bg-[#85a67a] text-black')}">
                     </div>
-                    <div class="border-t-2 border-[#3a2e28] pt-3">
-                        <p class="text-retro text-2xl font-bold">Lava Suite [(${i})]</p>
+
+                    <div class="text-pixel text-[8px] mb-4" th:text="'#' + ${room.roomId}"
+                         th:classappend="${room.status.name() == 'OCCUPIED' ? 'text-[#ffb570]' : 'text-[#3a2e28]'}"></div>
+                    
+                    <div class="flex justify-center my-6" th:switch="${room.status.name()}">
+                        <i th:case="'OCCUPIED'" class="fa-solid fa-dragon text-5xl text-[#ffb570]"></i>
+                        <i th:case="'DIRTY'" class="fa-solid fa-broom text-5xl text-gray-500"></i>
+                        <i th:case="*" class="fa-solid fa-volcano text-5xl text-[#3a2e28]"></i>
+                    </div>
+
+                    <div class="border-t-2 border-[#3a2e28] pt-3 text-center">
+                        <p class="text-retro text-2xl font-bold">Lava Suite</p>
+                        <p th:if="${room.currentGuest != null}" class="text-retro text-xl text-[#ffd96b]" th:text="${room.currentGuest.name}"></p>
+                        <p th:unless="${room.currentGuest != null}" class="text-retro text-lg text-gray-600 italic">READY</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- KLAN AIR (7 KAMAR) -->
         <section class="mb-12">
             <h3 class="text-pixel text-[10px] text-[#6ba3c5] mb-6 flex items-center gap-3">
-                <i class="fa-solid fa-droplet"></i> KLAN AIR (WATER ZONE)
+                <i class="fa-solid fa-droplet text-lg"></i> KLAN AIR (WATER ZONE)
             </h3>
             <div class="flex gap-6 overflow-x-auto pb-6 pixel-scroll">
-                <div th:each="i : ${#numbers.sequence(1, 7)}" class="room-box bg-[#051a2a] p-5 border-[#6ba3c5]">
-                    <div class="status-tag bg-[#e8734a] text-white font-bold">OCCUPIED</div>
-                    <div class="text-pixel text-[8px] text-[#3a6d8f] mb-4">#20[(${i})]</div>
-                    <div class="flex justify-center my-6">
-                        <i class="fa-solid fa-dragon text-5xl text-[#6ba3c5]"></i>
+                <div th:each="room : ${waterRooms}" class="room-box p-5"
+                     th:classappend="${room.status.name() == 'OCCUPIED' ? 'bg-[#0a1f2e] border-[#6ba3c5]' : (room.status.name() == 'DIRTY' ? 'bg-[#1a1a1a] opacity-70' : 'bg-[#051a2a]')}">
+                    
+                    <div class="status-tag font-bold" th:text="${room.status.label}"
+                         th:classappend="${room.status.name() == 'OCCUPIED' ? 'bg-[#e8734a] text-white' : (room.status.name() == 'DIRTY' ? 'bg-gray-700 text-gray-400' : 'bg-[#85a67a] text-black')}">
                     </div>
-                    <div class="border-t-2 border-[#3a6d8f] pt-3">
-                        <p class="text-retro text-2xl font-bold">Coral Reef [(${i})]</p>
+
+                    <div class="text-pixel text-[8px] mb-4" th:text="'#' + ${room.roomId}"
+                         th:classappend="${room.status.name() == 'OCCUPIED' ? 'text-[#9cd4ee]' : 'text-[#3a6d8f]'}"></div>
+                    
+                    <div class="flex justify-center my-6" th:switch="${room.status.name()}">
+                        <i th:case="'OCCUPIED'" class="fa-solid fa-dragon text-5xl text-[#9cd4ee]"></i>
+                        <i th:case="'DIRTY'" class="fa-solid fa-broom text-5xl text-gray-500"></i>
+                        <i th:case="*" class="fa-solid fa-water-ripple text-5xl text-[#3a6d8f]"></i>
+                    </div>
+
+                    <div class="border-t-2 border-[#3a6d8f] pt-3 text-center">
+                        <p class="text-retro text-2xl font-bold">Coral Reef</p>
+                        <p th:if="${room.currentGuest != null}" class="text-retro text-xl text-[#ffd96b]" th:text="${room.currentGuest.name}"></p>
+                        <p th:unless="${room.currentGuest != null}" class="text-retro text-lg text-gray-600 italic">READY</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- KLAN TANAH (7 KAMAR) -->
         <section class="mb-12">
             <h3 class="text-pixel text-[10px] text-[#85a67a] mb-6 flex items-center gap-3">
-                <i class="fa-solid fa-mountain"></i> KLAN TANAH (EARTH ZONE)
+                <i class="fa-solid fa-mountain text-lg"></i> KLAN TANAH (EARTH ZONE)
             </h3>
             <div class="flex gap-6 overflow-x-auto pb-6 pixel-scroll">
-                <div th:each="i : ${#numbers.sequence(1, 7)}" class="room-box bg-[#0a1805] p-5">
-                    <div class="status-tag bg-[#85a67a] text-black font-bold">READY</div>
-                    <div class="text-pixel text-[8px] text-[#5d8050] mb-4">#30[(${i})]</div>
-                    <div class="flex justify-center my-6">
-                        <i class="fa-solid fa-tree text-5xl text-[#5d8050]"></i>
+                <div th:each="room : ${earthRooms}" class="room-box p-5"
+                     th:classappend="${room.status.name() == 'OCCUPIED' ? 'bg-[#1a2418] border-[#85a67a]' : (room.status.name() == 'DIRTY' ? 'bg-[#1a1a1a] opacity-70' : 'bg-[#0a1805]')}">
+                    
+                    <div class="status-tag font-bold" th:text="${room.status.label}"
+                         th:classappend="${room.status.name() == 'OCCUPIED' ? 'bg-[#e8734a] text-white' : (room.status.name() == 'DIRTY' ? 'bg-gray-700 text-gray-400' : 'bg-[#85a67a] text-black')}">
                     </div>
-                    <div class="border-t-2 border-[#5d8050] pt-3">
-                        <p class="text-retro text-2xl font-bold">Terra Lodge [(${i})]</p>
+
+                    <div class="text-pixel text-[8px] mb-4" th:text="'#' + ${room.roomId}"
+                         th:classappend="${room.status.name() == 'OCCUPIED' ? 'text-[#b5d4a8]' : 'text-[#5d8050]'}"></div>
+                    
+                    <div class="flex justify-center my-6" th:switch="${room.status.name()}">
+                        <i th:case="'OCCUPIED'" class="fa-solid fa-dragon text-5xl text-[#b5d4a8]"></i>
+                        <i th:case="'DIRTY'" class="fa-solid fa-broom text-5xl text-gray-500"></i>
+                        <i th:case="*" class="fa-solid fa-tree text-5xl text-[#5d8050]"></i>
+                    </div>
+
+                    <div class="border-t-2 border-[#5d8050] pt-3 text-center">
+                        <p class="text-retro text-2xl font-bold">Terra Lodge</p>
+                        <p th:if="${room.currentGuest != null}" class="text-retro text-xl text-[#ffd96b]" th:text="${room.currentGuest.name}"></p>
+                        <p th:unless="${room.currentGuest != null}" class="text-retro text-lg text-gray-600 italic">READY</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
-
 </body>
 </html>

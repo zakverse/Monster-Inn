@@ -13,14 +13,10 @@
         .text-pixel { font-family: 'Press Start 2P', monospace; }
         .text-retro { font-family: 'VT323', monospace; }
         
-        .pixel-input {
-            background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none;
-        }
+        .pixel-input { background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none; }
         .pixel-input:focus { border-color: #ffd96b; }
 
-        .element-card {
-            border: 3px solid #3a2e28; transition: all 0.2s; cursor: pointer;
-        }
+        .element-card { border: 3px solid #3a2e28; transition: all 0.2s; cursor: pointer; }
         .element-card:hover { transform: translateY(-4px); }
         .active-fire { border-color: #e8734a; background: rgba(232, 115, 74, 0.1); }
         .active-water { border-color: #6ba3c5; background: rgba(107, 163, 197, 0.1); }
@@ -29,29 +25,25 @@
 </head>
 <body class="flex min-h-screen">
 
-    <!-- PEMANGGILAN SIDEBAR MENGGUNAKAN LAYOUT -->
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 p-8 overflow-y-auto">
         <header class="mb-10 border-b-4 border-[#3a2e28] pb-6">
             <div class="text-[#c08800] text-xs text-pixel mb-2">✦ INKRIPSI TAMU BARU</div>
             <h2 class="text-pixel text-xl text-[#ffd96b]">REGISTRASI TAMU</h2>
-            <p class="text-retro text-xl text-[#9c7ac4] mt-1 italic">Daftarkan penghuni monster baru ke dalam buku Inn.</p>
         </header>
 
         <form th:action="@{/registrasi/simpan}" method="post" class="max-w-4xl space-y-8">
             <div class="pixel-card p-8 space-y-8">
-                <!-- Nama Tamu -->
                 <div class="space-y-3">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase tracking-widest block">Nama Tamu Monster</label>
-                    <input type="text" name="namaTamu" placeholder="Gunakan aksara monster..." 
-                        class="pixel-input w-full px-5 py-4 text-retro text-2xl transition">
+                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase block">Nama Tamu Monster</label>
+                    <input type="text" name="namaTamu" required placeholder="Gunakan aksara monster..." 
+                        class="pixel-input w-full px-5 py-4 text-retro text-2xl">
                 </div>
 
-                <!-- Elemen Grid -->
                 <div class="space-y-4">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase tracking-widest block">Afinitas Elemen</label>
+                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase block">Afinitas Elemen</label>
+                    <input type="hidden" name="elemen" id="selected-element" required>
                     <div class="grid grid-cols-3 gap-6">
                         <div onclick="selectElement('fire')" id="el-fire" class="element-card p-6 text-center group">
                             <i class="fa-solid fa-fire text-3xl mb-3 text-[#a08860] group-hover:text-[#e8734a]"></i>
@@ -68,51 +60,59 @@
                     </div>
                 </div>
 
-                <!-- Alokasi Kamar -->
                 <div class="space-y-3">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase tracking-widest block">Alokasi Kamar Habitat</label>
-                    <select id="room-select" name="noKamar" class="pixel-input w-full px-5 py-4 text-retro text-2xl appearance-none cursor-pointer">
+                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase block">Alokasi Kamar Habitat</label>
+                    <select id="room-select" name="noKamar" required class="pixel-input w-full px-5 py-4 text-retro text-2xl appearance-none cursor-pointer">
                         <option value="">Pilih elemen terlebih dahulu...</option>
                     </select>
                 </div>
 
-                <!-- Deposit -->
                 <div class="space-y-3">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase tracking-widest block">Deposit Batu Mulia (Rp)</label>
-                    <input type="number" name="deposit" value="200000" 
-                        class="pixel-input w-full px-5 py-4 text-retro text-2xl transition">
+                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase block">Deposit Batu Mulia (Rp)</label>
+                    <input type="number" name="deposit" value="200000" class="pixel-input w-full px-5 py-4 text-retro text-2xl">
                 </div>
             </div>
 
-            <!-- Action Button -->
-            <button type="submit" class="w-full py-5 bg-[#d4a94a] border-4 border-[#3a2e28] text-[#3a2e28] text-pixel text-[10px] shadow-[6px_6px_0px_#000] hover:bg-[#ffd96b] active:translate-y-1 transition-all">
+            <button type="submit" class="w-full py-5 bg-[#d4a94a] border-4 border-[#3a2e28] text-[#3a2e28] text-pixel text-[10px] shadow-[6px_6px_0px_#000] hover:bg-[#ffd96b]">
                 SELESAIKAN INKRIPSI CHECK-IN ▶
             </button>
         </form>
     </main>
 
-    <script>
-        const rooms = {
-            fire: ["#101 - Lava Suite", "#102 - Ember Chamber"],
-            water: ["#201 - Aquarium Deluxe", "#202 - Coral Reef Room"],
-            earth: ["#301 - Forest Terrarium", "#302 - Mountain Lodge"]
-        };
+    <script th:inline="javascript">
+        /* Ambil data dari model Spring Boot */
+        const allAvailableRooms = /*[[${availableRooms}]]*/ [];
 
         function selectElement(type) {
-            // Reset cards
+            // 1. Simpan elemen ke hidden input
+            document.getElementById('selected-element').value = type;
+
+            // 2. UI Feedback
             document.querySelectorAll('.element-card').forEach(card => card.className = 'element-card p-6 text-center group');
-            // Active current
             document.getElementById(`el-${type}`).classList.add(`active-${type}`);
             
-            // Populate select
+            // 3. Filter Kamar berdasarkan elemen
             const select = document.getElementById('room-select');
-            select.innerHTML = '<option value="">Pilih kamar yang tersedia...</option>';
-            rooms[type].forEach(room => {
+            select.innerHTML = '<option value="">Pilih kamar ' + type.toUpperCase() + ' yang tersedia...</option>';
+            
+            // Cari kamar yang elemenCap-nya cocok dengan pilihan (case-insensitive)
+            const filtered = allAvailableRooms.filter(room => 
+                room.elementCap.toLowerCase() === type.toLowerCase() && !room.occupied
+            );
+
+            if (filtered.length === 0) {
                 const opt = document.createElement('option');
-                opt.value = room;
-                opt.textContent = room;
+                opt.textContent = "Kamar penuh/tidak tersedia!";
+                opt.disabled = true;
                 select.appendChild(opt);
-            });
+            } else {
+                filtered.forEach(room => {
+                    const opt = document.createElement('option');
+                    opt.value = room.roomId;
+                    opt.textContent = `#${room.roomId} - ${room.elementCap} Habitat (Rp${room.roomRate})`;
+                    select.appendChild(opt);
+                });
+            }
         }
     </script>
 </body>
