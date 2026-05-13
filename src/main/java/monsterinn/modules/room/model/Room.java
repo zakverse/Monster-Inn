@@ -13,14 +13,14 @@ public class Room {
 
     @Id
     private String roomId;
-    private String elementCap; // Isi: Api, Air, atau Tanah
+    private String elementCap; // Api, Air, Tanah
     private double roomRate;
     private boolean isOccupied = false;
 
     @Enumerated(EnumType.STRING)
     private RoomStatus status = RoomStatus.AVAILABLE;
 
-    @OneToOne
+    @OneToOne(optional = true)
     @JoinColumn(name = "guest_id")
     private Monster currentGuest;
 
@@ -31,27 +31,27 @@ public class Room {
     }
 
     public void checkIn(Monster guest) {
-        if (guest == null) throw new IllegalArgumentException("Guest tidak boleh kosong!");
+        if (guest == null) throw new IllegalArgumentException("Monster tidak boleh kosong!");
+        if (this.status != RoomStatus.AVAILABLE) throw new IllegalStateException("Kamar tidak siap!");
         
-        if (this.status != RoomStatus.AVAILABLE) {
-            throw new IllegalStateException("Kamar sedang tidak tersedia!");
-        }
-
-        // Validasi Habitat: Memastikan elemen monster cocok dengan kapasitas kamar
+        // Validasi Habitat
         if (!guest.getElement().equalsIgnoreCase(this.elementCap)) {
-            throw new IllegalArgumentException("Elemen Monster " + guest.getElement() + 
-                " tidak cocok dengan habitat " + this.elementCap);
+            throw new IllegalArgumentException("Elemen tidak cocok!");
         }
 
         this.currentGuest = guest;
         this.isOccupied = true;
         this.status = RoomStatus.OCCUPIED;
+        guest.setRoomId(this.roomId);
     }
 
     public void checkOut() {
+        if (this.currentGuest != null) {
+            this.currentGuest.setRoomId(null);
+        }
         this.currentGuest = null;
         this.isOccupied = false;
-        this.status = RoomStatus.DIRTY;
+        this.status = RoomStatus.DIRTY; // Berubah jadi kotor setelah tamu keluar
     }
 
     public void markCleaned() {

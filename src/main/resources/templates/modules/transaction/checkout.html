@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -12,80 +11,57 @@
         .pixel-card { background: #1e1825; border: 4px solid #3a2e28; box-shadow: 6px 6px 0px #000; }
         .text-pixel { font-family: 'Press Start 2P', monospace; }
         .text-retro { font-family: 'VT323', monospace; }
-        
         .pixel-input { background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none; }
-        .pixel-input:focus { border-color: #ffd96b; }
-
-        .invoice-box { background: #f4e8d0; color: #3a2e28; border: 4px solid #3a2e28; padding: 2rem; position: relative; }
-        .invoice-box::before { content: ''; position: absolute; top: -10px; left: 20px; width: 40px; height: 10px; background: #3a2e28; }
+        .invoice-box { background: #f4e8d0; color: #3a2e28; border: 4px solid #3a2e28; padding: 2rem; }
     </style>
 </head>
 <body class="flex min-h-screen">
-
-    <!-- IMPORT SIDEBAR[cite: 1] -->
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 p-8 overflow-y-auto">
         <header class="mb-10 border-b-4 border-[#3a2e28] pb-6">
-            <div class="text-[#c08800] text-xs text-pixel mb-2 uppercase">✦ Finalisasi Tagihan</div>
             <h2 class="text-pixel text-xl text-[#ffd96b]">CHECKOUT & TAGIHAN</h2>
-            <p class="text-retro text-xl text-[#9c7ac4] mt-1 italic">Hitung kepingan emas sebelum tamu meninggalkan gua.</p>
         </header>
 
         <div class="grid grid-cols-12 gap-8">
-            <!-- Seleksi Tamu untuk Checkout -->
             <div class="col-span-5 space-y-6">
                 <div class="pixel-card p-6">
                     <label class="text-pixel text-[8px] text-[#ffd96b] block mb-4 uppercase">Siapa yang akan keluar?</label>
-                    <select id="checkout-select" onchange="generateInvoice()" class="pixel-input w-full px-4 py-3 text-retro text-2xl appearance-none cursor-pointer">
+                    <select id="checkout-select" onchange="loadInvoice()" class="pixel-input w-full px-4 py-3 text-retro text-2xl appearance-none cursor-pointer">
                         <option value="">Pilih tamu...</option>
-                        <option value="fire">Ember Blaze (#102)</option>
-                        <option value="water">Wade Ripple (#202)</option>
+                        <option th:each="g : ${activeGuests}" th:value="${g.idMonster}" th:text="${g.name + ' (#' + g.roomId + ')'}"></option>
                     </select>
                 </div>
-
-                <!-- Info Singkat Kamar -->
                 <div id="room-info" class="pixel-card p-6 hidden">
-                    <h4 class="text-pixel text-[7px] text-[#9c7ac4] mb-4">DATA HABITAT</h4>
-                    <div class="space-y-2 text-retro text-xl">
-                        <div class="flex justify-between"><span>Kamar:</span> <span id="info-room" class="font-bold"></span></div>
-                        <div class="flex justify-between"><span>Durasi:</span> <span id="info-stay" class="text-[#ffd96b]"></span></div>
-                    </div>
+                    <div class="text-retro text-2xl">Kamar: <span id="info-room" class="font-bold"></span></div>
+                    <div class="text-retro text-2xl">Durasi: <span id="info-stay"></span></div>
                 </div>
             </div>
 
-            <!-- Area Invoice -->
             <div class="col-span-7">
                 <div id="invoice-ui" class="invoice-box hidden shadow-[12px_12px_0px_rgba(0,0,0,0.5)]">
-                    <div class="text-center border-b-2 border-dashed border-[#3a2e28] pb-4 mb-6">
-                        <h3 class="text-pixel text-[10px] uppercase">Rincian Pembayaran</h3>
-                        <p class="text-retro text-lg opacity-70">Monster Inn - Branch Isekai</p>
-                    </div>
-
+                    <h3 class="text-pixel text-center text-[10px] mb-6 border-b-2 border-dashed border-[#3a2e28] pb-4">STRUK TAGIHAN</h3>
+                    
                     <div class="space-y-4 text-retro text-2xl">
                         <div class="flex justify-between">
-                            <span id="inv-room-name"></span>
-                            <span id="inv-room-price" class="font-bold"></span>
+                            <span id="inv-label-room">Sewa Kamar</span>
+                            <span id="inv-val-room" class="font-bold"></span>
                         </div>
-                        <div id="inv-services" class="space-y-2 border-t border-[#3a2e28] pt-4">
-                            <!-- List Layanan Muncul di Sini -->
-                        </div>
-                        
+                        <div id="inv-services" class="border-t border-[#3a2e28] pt-2 space-y-1"></div>
                         <div class="border-t-4 border-[#3a2e28] pt-4 mt-6">
-                            <div class="flex justify-between text-[#a74520]">
-                                <span>Deposit:</span>
-                                <span id="inv-deposit"></span>
+                            <div class="flex justify-between opacity-60">
+                                <span>Uang Muka:</span>
+                                <span id="inv-val-prepaid"></span>
                             </div>
                             <div class="flex justify-between text-3xl font-bold mt-2">
-                                <span>TOTAL AKHIR:</span>
-                                <span id="inv-grand-total"></span>
+                                <span>TOTAL:</span>
+                                <span id="inv-val-total"></span>
                             </div>
                         </div>
                     </div>
 
-                    <button class="w-full mt-8 py-4 bg-[#3a2e28] text-[#f4e8d0] text-pixel text-[8px] hover:bg-[#0f0b14] transition-all">
-                        PROSES PEMBAYARAN EMAS ▶
+                    <button onclick="confirmCheckout()" class="w-full mt-8 py-4 bg-[#3a2e28] text-[#f4e8d0] text-pixel text-[8px] hover:bg-black transition-all">
+                        PROSES CHECKOUT ▶
                     </button>
                 </div>
             </div>
@@ -93,38 +69,35 @@
     </main>
 
     <script>
-        const mockData = {
-            fire: { room: "Lava Suite", stay: "2 Malam", rate: 450000, deposit: -200000, services: [{n: "Lava Bath", p: 75000}] },
-            water: { room: "Coral Reef", stay: "1 Malam", rate: 480000, deposit: -250000, services: [{n: "Deep Sea Mist", p: 45000}] }
-        };
+        async function loadInvoice() {
+            const guestId = document.getElementById('checkout-select').value;
+            if(!guestId) return;
 
-        function generateInvoice() {
-            const val = document.getElementById('checkout-select').value;
-            const ui = document.getElementById('invoice-ui');
-            const info = document.getElementById('room-info');
-            
-            if(!val) { ui.classList.add('hidden'); info.classList.add('hidden'); return; }
-            
-            const data = mockData[val];
-            ui.classList.remove('hidden');
-            info.classList.remove('hidden');
+            const res = await fetch(`/api/checkout-info/${guestId}`);
+            const data = await res.json();
 
-            document.getElementById('info-room').innerText = data.room;
-            document.getElementById('info-stay').innerText = data.stay;
-            document.getElementById('inv-room-name').innerText = `${data.room} (${data.stay})`;
-            document.getElementById('inv-room-price').innerText = `Rp ${data.rate.toLocaleString()}`;
-            document.getElementById('inv-deposit').innerText = `Rp ${data.deposit.toLocaleString()}`;
+            document.getElementById('invoice-ui').classList.remove('hidden');
+            document.getElementById('room-info').classList.remove('hidden');
 
-            let sHtml = '';
-            let sTotal = 0;
-            data.services.forEach(s => {
-                sHtml += `<div class="flex justify-between text-lg opacity-80 italic"><span>+ ${s.n}</span><span>Rp ${s.p.toLocaleString()}</span></div>`;
-                sTotal += s.p;
-            });
-            document.getElementById('inv-services').innerHTML = sHtml;
-            
-            const total = data.rate + sTotal + data.deposit;
-            document.getElementById('inv-grand-total').innerText = `Rp ${total.toLocaleString()}`;
+            document.getElementById('info-room').innerText = "#" + data.roomId;
+            document.getElementById('info-stay').innerText = data.stayDays + " Malam";
+            document.getElementById('inv-val-room').innerText = "Rp " + data.roomTotal.toLocaleString();
+            document.getElementById('inv-val-prepaid').innerText = "- Rp " + data.prepaid.toLocaleString();
+            document.getElementById('inv-val-total').innerText = "Rp " + data.grandTotal.toLocaleString();
+
+            let servicesHtml = data.serviceLog.map(s => `<div class="flex justify-between text-lg italic"><span>+ ${s}</span></div>`).join('');
+            document.getElementById('inv-services').innerHTML = servicesHtml || '<p class="text-sm italic">Tanpa layanan tambahan</p>';
+        }
+
+        async function confirmCheckout() {
+            const guestId = document.getElementById('checkout-select').value;
+            if(!confirm("Proses checkout? Data naga akan dihapus dan kamar dikosongkan.")) return;
+
+            const res = await fetch(`/api/checkout/confirm/${guestId}`, { method: 'POST' });
+            if(res.ok) {
+                alert("Checkout Berhasil! Naga telah terbang pulang.");
+                window.location.href = "/room"; // Ke Status Kamar
+            }
         }
     </script>
 </body>

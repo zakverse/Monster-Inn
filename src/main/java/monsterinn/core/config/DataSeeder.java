@@ -1,59 +1,50 @@
-package monsterinn.core.config; // Package disesuaikan ke folder core.config
+// package monsterinn.core.config;
 
-import monsterinn.modules.monster.model.*;
-import monsterinn.modules.room.model.*;
-import monsterinn.modules.service.model.ServiceEntity;
-import monsterinn.modules.room.repository.RoomRepository;
-import monsterinn.modules.monster.repository.MonsterRepository;
-import monsterinn.modules.service.repository.ServiceRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+// import monsterinn.modules.monster.model.*;
+// import monsterinn.modules.room.model.*;
+// import monsterinn.modules.room.repository.RoomRepository;
+// import monsterinn.modules.monster.repository.MonsterRepository;
+// import org.springframework.boot.CommandLineRunner;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+// @Configuration
+// public class DataSeeder {
 
-@Configuration
-public class DataSeeder {
+//     @Bean
+//     CommandLineRunner initDatabase(RoomRepository roomRepo, MonsterRepository monsterRepo) {
+//         return args -> {
+//             // 1. Generate 15 Kamar (5 per elemen)
+//             if (roomRepo.count() == 0) {
+//                 for (int i = 1; i <= 5; i++) {
+//                     roomRepo.save(new Room("10" + i, "FIRE", 150000));
+//                     roomRepo.save(new Room("20" + i, "WATER", 175000));
+//                     roomRepo.save(new Room("30" + i, "EARTH", 120000));
+//                 }
+//                 System.out.println("✦ [SEEDER] 15 Kamar Berhasil Dibuat!");
+//             }
 
-    @Bean
-    CommandLineRunner initDatabase(
-            RoomRepository roomRepo, 
-            MonsterRepository monsterRepo,
-            ServiceRepository serviceRepo) {
-        return args -> {
+//             // 2. Data Tamu Awal
+//             if (monsterRepo.count() == 0) {
+//                 // Ember Blaze -> Kamar 101 (FIRE)
+//                 FireMonster ember = new FireMonster("M-001", "Ember Blaze", 50000.0, 15000.0);
+//                 Room r101 = roomRepo.findById("101").orElse(null);
+//                 if (r101 != null) {
+//                     r101.checkIn(ember);
+//                     monsterRepo.save(ember);
+//                     roomRepo.save(r101);
+//                 }
 
-            // 1. DATA KAMAR
-            if (roomRepo.count() == 0) {
-                roomRepo.saveAll(List.of(
-                    new Room("101", "Api", 150000),
-                    new Room("201", "Air", 175000),
-                    new Room("301", "Tanah", 120000)
-                ));
-            }
-
-            // 2. DATA MENU LAYANAN
-            if (serviceRepo.count() == 0) {
-                serviceRepo.saveAll(List.of(
-                    new ServiceEntity("Magma Injection", 60000.0, "Api", "fa-fire"),
-                    new ServiceEntity("Lava Bath", 75000.0, "Api", "fa-hot-tub-person"),
-                    new ServiceEntity("Aquatic Nutrient", 70000.0, "Air", "fa-droplet"),
-                    new ServiceEntity("Deep Sea Mist", 45000.0, "Air", "fa-cloud-showers-heavy"),
-                    new ServiceEntity("Soil Nutrient", 50000.0, "Tanah", "fa-leaf")
-                ));
-            }
-
-            // 3. DATA TAMU AKTIF
-            if (monsterRepo.count() == 0) {
-                FireMonster ember = new FireMonster("M-001", "Ember Blaze", 50000.0, 15000.0);
-                ember.setRoomId("101");
-                monsterRepo.save(ember);
-
-                WaterMonster wade = new WaterMonster("M-002", "Wade Ripple", 55000.0, 20000.0);
-                wade.setRoomId("201");
-                monsterRepo.save(wade);
-            }
-            
-            System.out.println("✦ [CORE] Data Seeder Berhasil Dijalankan di folder Config!");
-        };
-    }
-}
+//                 // Wade Ripple -> Kamar 201 (WATER)
+//                 WaterMonster wade = new WaterMonster("M-002", "Wade Ripple", 55000.0, 20000.0);
+//                 Room r201 = roomRepo.findById("201").orElse(null);
+//                 if (r201 != null) {
+//                     r201.checkIn(wade);
+//                     monsterRepo.save(wade);
+//                     roomRepo.save(r201);
+//                 }
+//                 System.out.println("✦ [SEEDER] Tamu Berhasil Check-in!");
+//             }
+//         };
+//     }
+// }

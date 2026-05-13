@@ -19,23 +19,19 @@ public class AuthController {
 
     // 2. Menangkap data ketika tombol "Login" ditekan
     @PostMapping("/login")
-    public String processLogin(@RequestParam("username") String inputUsername, 
-                            @RequestParam("password") String inputPassword, 
-                            Model model) {
-        
-        // Simulasi data dari database (karena ini purwarupa)
-        User registeredReceptionist = new User("admin", "admin123", "Receptionist");
+public String processLogin(@RequestParam("username") String inputUsername, 
+                        @RequestParam("password") String inputPassword, 
+                        Model model) {
+    
+    // Akun tunggal Admin (Hardcoded sesuai permintaanmu)
+    User registeredReceptionist = new User("admin", "admin123", "Receptionist");
 
-        // MEMANGGIL METODE ENKAPSULASI: Validasi password dilakukan di dalam objek User
-        boolean isValid = registeredReceptionist.validate(inputUsername, inputPassword);
-
-        if (isValid) {
-            // Jika benar, pindah ke halaman dashboard
-            return "redirect:/dashboard"; 
-        } else {
-            // Jika salah, kembali ke login dan tampilkan pesan error
-            model.addAttribute("error", "Username atau Password salah!");
-            return "modules/auth/login";
-        }
+    // VALIDASI ENKAPSULASI (Ini yang dapet nilai OOP)
+    if (registeredReceptionist.validate(inputUsername, inputPassword)) {
+        return "redirect:/dashboard"; 
+    } else {
+        model.addAttribute("error", "Maaf, kunci lobi tidak cocok! (Username/Password Salah)");
+        return "modules/auth/login";
     }
+}
 }
