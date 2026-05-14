@@ -84,36 +84,32 @@
         const allAvailableRooms = /*[[${availableRooms}]]*/ [];
 
         function selectElement(type) {
-            // 1. Simpan elemen ke hidden input
-            document.getElementById('selected-element').value = type;
+        document.getElementById('selected-element').value = type;
 
-            // 2. UI Feedback
-            document.querySelectorAll('.element-card').forEach(card => card.className = 'element-card p-6 text-center group');
-            document.getElementById(`el-${type}`).classList.add(`active-${type}`);
-            
-            // 3. Filter Kamar berdasarkan elemen
-            const select = document.getElementById('room-select');
-            select.innerHTML = '<option value="">Pilih kamar ' + type.toUpperCase() + ' yang tersedia...</option>';
-            
-            // Cari kamar yang elemenCap-nya cocok dengan pilihan (case-insensitive)
-            const filtered = allAvailableRooms.filter(room => 
-                room.elementCap.toLowerCase() === type.toLowerCase() && !room.occupied
-            );
+        // UI Feedback
+        document.querySelectorAll('.element-card').forEach(card => card.className = 'element-card p-6 text-center group');
+        document.getElementById(`el-${type}`).classList.add(`active-${type}`);
+        
+        const select = document.getElementById('room-select');
+        select.innerHTML = '<option value="">Pilih habitat ' + type.toUpperCase() + '...</option>';
+        
+        // Filter kamar berdasarkan elementCap di DB (FIRE/WATER/EARTH)
+        const filtered = allAvailableRooms.filter(room => 
+            room.elementCap.toLowerCase() === type.toLowerCase() && !room.occupied
+        );
 
-            if (filtered.length === 0) {
+        if (filtered.length === 0) {
+            select.innerHTML = '<option value="" disabled>Kamar penuh!</option>';
+        } else {
+            filtered.forEach(room => {
                 const opt = document.createElement('option');
-                opt.textContent = "Kamar penuh/tidak tersedia!";
-                opt.disabled = true;
+                opt.value = room.roomId; // ID Kamar yang akan dikirim ke Java
+                opt.textContent = `#${room.roomId} - ${room.elementCap} Habitat (Rp${room.roomRate})`;
                 select.appendChild(opt);
-            } else {
-                filtered.forEach(room => {
-                    const opt = document.createElement('option');
-                    opt.value = room.roomId;
-                    opt.textContent = `#${room.roomId} - ${room.elementCap} Habitat (Rp${room.roomRate})`;
-                    select.appendChild(opt);
-                });
-            }
+            });
         }
+    }
+        
     </script>
 </body>
 </html>
