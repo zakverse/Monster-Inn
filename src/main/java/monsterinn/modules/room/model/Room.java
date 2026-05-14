@@ -13,14 +13,15 @@ public class Room {
 
     @Id
     private String roomId;
-    private String elementCap; // Api, Air, Tanah
+    private String elementCap; // FIRE, WATER, EARTH (Samakan dengan DB)
     private double roomRate;
     private boolean isOccupied = false;
 
     @Enumerated(EnumType.STRING)
     private RoomStatus status = RoomStatus.AVAILABLE;
 
-    @OneToOne(optional = true)
+    // Tambahkan CascadeType.ALL agar simpan otomatis
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "guest_id")
     private Monster currentGuest;
 
@@ -34,9 +35,9 @@ public class Room {
         if (guest == null) throw new IllegalArgumentException("Monster tidak boleh kosong!");
         if (this.status != RoomStatus.AVAILABLE) throw new IllegalStateException("Kamar tidak siap!");
         
-        // Validasi Habitat
+        // Pastikan elementCap di DB (FIRE/WATER/EARTH) sama dengan guest.getElement()
         if (!guest.getElement().equalsIgnoreCase(this.elementCap)) {
-            throw new IllegalArgumentException("Elemen tidak cocok!");
+            throw new IllegalArgumentException("Habitat tidak cocok! Kamar ini untuk elemen " + this.elementCap);
         }
 
         this.currentGuest = guest;
@@ -51,7 +52,7 @@ public class Room {
         }
         this.currentGuest = null;
         this.isOccupied = false;
-        this.status = RoomStatus.DIRTY; // Berubah jadi kotor setelah tamu keluar
+        this.status = RoomStatus.DIRTY;
     }
 
     public void markCleaned() {
