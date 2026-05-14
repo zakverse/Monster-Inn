@@ -5,6 +5,8 @@ import monsterinn.modules.room.repository.RoomRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import java.util.List;
 
 @Controller
@@ -18,10 +20,9 @@ public class RoomController {
 
     @GetMapping("/room")
     public String showRoomStatus(Model model) {
-        // Ambil semua data kamar dari MySQL
         List<Room> allRooms = roomRepository.findAll();
 
-        // Filter menggunakan String yang sama dengan Database (FIRE, WATER, EARTH)
+        // Pisahin kamar berdasarkan elemen (Sesuai Enum/String di DB: FIRE, WATER, EARTH)
         model.addAttribute("fireRooms", allRooms.stream()
             .filter(r -> r.getElementCap().equalsIgnoreCase("FIRE")).toList());
         
@@ -31,10 +32,16 @@ public class RoomController {
         model.addAttribute("earthRooms", allRooms.stream()
             .filter(r -> r.getElementCap().equalsIgnoreCase("EARTH")).toList());
 
-        // Penanda untuk sidebar (biar menu Status Kamar kelihatan aktif)
         model.addAttribute("activePage", "room");
-        
-        // Pastikan nama file HTML lu adalah status_kamar.html
         return "modules/room/status_kamar"; 
+    }
+
+    // Fitur tambahan buat bersihin kamar dari kotor ke tersedia
+    @PostMapping("/room/clean/{id}")
+    public String cleanRoom(@PathVariable String id) {
+        Room kamar = roomRepository.findById(id).orElseThrow();
+        kamar.markCleaned();
+        roomRepository.save(kamar);
+        return "redirect:/room";
     }
 }
