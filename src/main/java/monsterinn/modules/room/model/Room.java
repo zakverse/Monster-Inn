@@ -1,6 +1,7 @@
 package monsterinn.modules.room.model;
 
 import monsterinn.modules.monster.model.Monster;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,19 +10,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "rooms")
+@JsonIgnoreProperties({"currentGuest"})
 public class Room {
 
     @Id
     private String roomId;
-    private String elementCap; // FIRE, WATER, EARTH (Samakan dengan DB)
+    private String elementCap; // Isi: FIRE, WATER, atau EARTH
     private double roomRate;
     private boolean isOccupied = false;
 
     @Enumerated(EnumType.STRING)
     private RoomStatus status = RoomStatus.AVAILABLE;
 
-    // Tambahkan CascadeType.ALL agar simpan otomatis
-    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "guest_id")
     private Monster currentGuest;
 
@@ -32,23 +33,26 @@ public class Room {
     }
 
     public void checkIn(Monster guest) {
-        if (guest == null) throw new IllegalArgumentException("Monster tidak boleh kosong!");
-        if (this.status != RoomStatus.AVAILABLE) throw new IllegalStateException("Kamar tidak siap!");
+        if (guest == null) throw new IllegalArgumentException("Guest tidak boleh kosong!");
         
-        // Pastikan elementCap di DB (FIRE/WATER/EARTH) sama dengan guest.getElement()
+        if (this.status != RoomStatus.AVAILABLE) {
+            throw new IllegalStateException("Kamar sedang tidak tersedia!");
+        }
+
+        // Validasi Habitat: Memastikan elemen monster cocok dengan kapasitas kamar
         if (!guest.getElement().equalsIgnoreCase(this.elementCap)) {
-            throw new IllegalArgumentException("Habitat tidak cocok! Kamar ini untuk elemen " + this.elementCap);
+            throw new IllegalArgumentException("Elemen Monster " + guest.getElement() + 
+                " tidak cocok dengan habitat " + this.elementCap);
         }
 
         this.currentGuest = guest;
         this.isOccupied = true;
         this.status = RoomStatus.OCCUPIED;
-        guest.setRoomId(this.roomId);
     }
 
     public void checkOut() {
-        if (this.currentGuest != null) {
-            this.currentGuest.setRoomId(null);
+        if (this.status != RoomStatus.OCCUPIED || this.currentGuest == null) {
+            throw new IllegalStateException("Kamar tidak sedang ditempati!");
         }
         this.currentGuest = null;
         this.isOccupied = false;
