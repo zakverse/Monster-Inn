@@ -14,123 +14,133 @@
     left: 0; top: 0; bottom: 0;
     z-index: 50;
 ">
-    <!-- Logo -->
-    <div style="padding: 24px 20px; border-bottom: 4px solid #3a2e28; background: #050208;">
-        <div style="font-family: 'Press Start 2P', monospace; font-size: 13px; color: #ffd96b; text-shadow: 2px 2px 0 #000; letter-spacing: 1px;">
-            🏨 MONSTER INN
+    <!-- Logo & Header Terminal -->
+    <div style="padding: 28px 20px; border-bottom: 4px solid #3a2e28; background: #050208; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 12px; color: #ffd96b; text-shadow: 2px 2px 0 #000; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-hotel" style="color: #ffd96b; font-size: 1.3rem;"></i> MONSTER INN
         </div>
-        <div style="font-family: 'VT323', monospace; font-size: 16px; color: #9c7ac4; margin-top: 6px;">
+        <div style="font-family: 'VT323', monospace; font-size: 18px; color: #9c7ac4; padding-left: 28px;">
             Front Desk Terminal
         </div>
     </div>
 
-    <!-- Nav Links -->
-    <div style="flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px;">
+    <!-- Nav Links (Diperbesar & Diperluas Jaraknya) -->
+    <div style="flex: 1; padding: 24px 16px; display: flex; flex-direction: column; gap: 12px;">
 
+        <!-- OVERVIEW / DASHBOARD -->
         <a th:href="@{/dashboard}" style="
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 14px;
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
             color: #f4e8d0;
             text-decoration: none;
             font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
-            letter-spacing: 1px;
+            font-size: 10px;
+            稳定-spacing: 1px;
             border: 2px solid transparent;
             transition: all 0.15s;
         "
         onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
         onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
-            <span>📊</span> OVERVIEW
+            <i class="fa-solid fa-gauge-high" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> OVERVIEW
         </a>
 
+        <!-- STATUS KAMAR -->
         <a th:href="@{/room/status}" style="
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 14px;
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
             color: #f4e8d0;
             text-decoration: none;
             font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
+            font-size: 10px;
             letter-spacing: 1px;
             border: 2px solid transparent;
             transition: all 0.15s;
         "
         onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
         onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
-            <span>🏨</span> STATUS KAMAR
+            <i class="fa-solid fa-bed" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> STATUS KAMAR
         </a>
 
+        <!-- REGISTRASI TAMU -->
         <a th:href="@{/registrasi}" style="
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 14px;
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
             color: #f4e8d0;
             text-decoration: none;
             font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
+            font-size: 10px;
             letter-spacing: 1px;
             border: 2px solid transparent;
+            transition: all 0.15s;
         "
         onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
         onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
-            <span>📋</span> REGISTRASI
+            <i class="fa-solid fa-user-plus" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> REGISTRASI
         </a>
 
+        <!-- LAYANAN TAMBAHAN -->
         <a th:href="@{/layanan}" style="
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 14px;
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
             color: #f4e8d0;
             text-decoration: none;
             font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
+            font-size: 10px;
             letter-spacing: 1px;
             border: 2px solid transparent;
+            transition: all 0.15s;
         "
         onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
         onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
-            <span>✨</span> LAYANAN
+            <i class="fa-solid fa-wand-magic-sparkles" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> LAYANAN
         </a>
 
+        <!-- CHECKOUT & BILLING -->
         <a th:href="@{/checkout}" style="
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 14px;
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
             color: #f4e8d0;
             text-decoration: none;
             font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
+            font-size: 10px;
             letter-spacing: 1px;
             border: 2px solid transparent;
+            transition: all 0.15s;
         "
         onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
         onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
-            <span>💰</span> CHECKOUT
+            <i class="fa-solid fa-money-bill-wave" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> CHECKOUT
         </a>
 
+        <!-- LAPORAN HARIAN -->
         <a th:href="@{/laporan}" style="
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 14px;
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
             color: #f4e8d0;
             text-decoration: none;
             font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
+            font-size: 10px;
             letter-spacing: 1px;
             border: 2px solid transparent;
+            transition: all 0.15s;
         "
         onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
         onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
-            <span>📊</span> LAPORAN
+            <i class="fa-solid fa-chart-line" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> LAPORAN
         </a>
     </div>
 
-    <!-- Logout -->
-    <div style="padding: 16px 12px; border-top: 4px solid #3a2e28;">
+    <!-- SHIFT NIGHT LOGOUT -->
+    <div style="padding: 20px 16px; border-top: 4px solid #3a2e28;">
         <form th:action="@{/logout}" method="post">
             <button type="submit" style="
                 width: 100%;
-                display: flex; align-items: center; gap: 12px;
-                padding: 12px 14px;
+                display: flex; align-items: center; justify-content: center; gap: 14px;
+                padding: 14px 16px;
                 background: transparent;
                 color: #e8734a;
                 font-family: 'Press Start 2P', monospace;
-                font-size: 8px;
+                font-size: 10px;
                 letter-spacing: 1px;
                 border: 2px solid #e8734a;
                 cursor: pointer;
@@ -138,7 +148,7 @@
             "
             onmouseover="this.style.background='#e8734a'; this.style.color='#000';"
             onmouseout="this.style.background='transparent'; this.style.color='#e8734a';">
-                <span>🚪</span> LOGOUT
+                <i class="fa-solid fa-door-open" style="font-size: 1.2rem;"></i> LOGOUT
             </button>
         </form>
     </div>

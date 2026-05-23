@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/service")
+@RequestMapping("/layanan")
 public class ServiceController {
 
     private final MonsterRepository monsterRepository;

@@ -22,4 +22,3 @@ public class AuthController {
         return "modules/auth/login";
     }
 }
-}

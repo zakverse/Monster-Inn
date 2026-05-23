@@ -23,14 +23,14 @@ public class ReportController {
 
         // 1. Hitung Total Omset
         double totalRevenue = history.stream()
-                .mapToDouble(t -> t.getTotalCost() != null ? t.getTotalCost() : 0.0)
+                .mapToDouble(Transaction::getTotalCost)
                 .sum();
 
         // 2. Hitung Popularitas Elemen (Persentase)
         long total = history.size();
-        long fireCount = history.stream().filter(t -> t.getGuest().getElement().equalsIgnoreCase("FIRE")).count();
-        long waterCount = history.stream().filter(t -> t.getGuest().getElement().equalsIgnoreCase("WATER")).count();
-        long earthCount = history.stream().filter(t -> t.getGuest().getElement().equalsIgnoreCase("EARTH")).count();
+        long fireCount = history.stream().filter(t -> t.getElement() != null && t.getElement().equalsIgnoreCase("FIRE")).count();
+        long waterCount = history.stream().filter(t -> t.getElement() != null && t.getElement().equalsIgnoreCase("WATER")).count();
+        long earthCount = history.stream().filter(t -> t.getElement() != null && t.getElement().equalsIgnoreCase("EARTH")).count();
 
         // Jaga-jaga kalau pembagi nol
         double firePct = total > 0 ? (double) fireCount / total * 100 : 0;
