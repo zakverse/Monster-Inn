@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/monster-inn-ui.css}">
+    <th:block th:replace="~{layout/monster-style :: monster-style}"></th:block>
     <title>Laporan Harian — Monster Inn</title>
     <style>
-        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; }
-        .pixel-card { background: #1e1825; border: 4px solid #3a2e28; box-shadow: 6px 6px 0px #000; }
+        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; margin: 0; }
         .text-pixel { font-family: 'Press Start 2P', monospace; }
         .text-retro { font-family: 'VT323', monospace; }
         
@@ -22,45 +22,48 @@
         ::-webkit-scrollbar-thumb { background: #3a2e28; }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen">
 
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
-    <main class="flex-1 p-8 overflow-y-auto">
-        <header class="mb-10 border-b-4 border-[#3a2e28] pb-6 flex justify-between items-end">
+    <main class="flex-1 p-8 overflow-y-auto" style="margin-left: 260px;">
+        <header class="mb-10 pb-6 flex justify-between items-end" style="border-bottom: 4px solid #3a2e28;">
             <div>
-                <div class="text-[#c08800] text-xs text-pixel mb-2 uppercase">✦ Rekapitulasi Operasional</div>
-                <h2 class="text-pixel text-xl text-[#ffd96b]">LAPORAN HARIAN</h2>
-                <p class="text-retro text-xl text-[#9c7ac4] mt-1 italic">Analisis performa penginapan antar-dimensi.</p>
+                <div class="text-xs text-pixel mb-2 uppercase" style="color: #c08800;">✦ Rekapitulasi Operasional</div>
+                <h2 class="text-pixel text-xl" style="color: #ffd96b;">LAPORAN HARIAN</h2>
+                <p class="text-retro text-xl mt-1 italic" style="color: #9c7ac4;">Analisis performa penginapan antar-dimensi.</p>
             </div>
-            <button onclick="window.print()" class="bg-[#85a67a] border-4 border-[#3a2e28] text-[#3a2e28] px-6 py-2 text-pixel text-[8px] shadow-[4px_4px_0px_#000] hover:bg-[#b5d4a8] active:translate-y-1 active:shadow-none transition-all">
+            <button onclick="window.print()" class="text-pixel cursor-pointer" 
+                style="font-size: 8px; background: #85a67a; border: 4px solid #3a2e28; color: #3a2e28; padding: 8px 24px; box-shadow: 4px 4px 0 #000; transition: all 0.15s;"
+                onmouseover="this.style.background='#b5d4a8'; this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='6px 6px 0 #000';"
+                onmouseout="this.style.background='#85a67a'; this.style.transform='none'; this.style.boxShadow='4px 4px 0 #000';">
                 EXPORT DATA
             </button>
         </header>
 
         <div class="grid grid-cols-3 gap-8 mb-10">
-            <div class="pixel-card p-6 border-b-4 border-b-[#ffd96b]">
-                <p class="text-pixel text-[7px] text-[#9c7ac4] mb-3 uppercase">Pendapatan Emas</p>
-                <p class="text-retro text-3xl text-[#ffd96b] font-bold" 
+            <div class="pixel-card p-6" style="border-bottom: 4px solid #ffd96b;">
+                <p class="text-pixel uppercase mb-3" style="font-size: 7px; color: #9c7ac4;">Pendapatan Emas</p>
+                <p class="text-retro text-3xl font-bold" style="color: #ffd96b;" 
                    th:text="'Rp ' + ${#numbers.formatDecimal(revenue, 0, 'POINT', 0, 'COMMA')}"></p>
             </div>
-            <div class="pixel-card p-6 border-b-4 border-b-[#6ba3c5]">
-                <p class="text-pixel text-[7px] text-[#9c7ac4] mb-3 uppercase">Total Transaksi</p>
-                <p class="text-retro text-3xl text-[#6ba3c5] font-bold" th:text="${totalOrders} + ' Order'"></p>
+            <div class="pixel-card p-6" style="border-bottom: 4px solid #6ba3c5;">
+                <p class="text-pixel uppercase mb-3" style="font-size: 7px; color: #9c7ac4;">Total Transaksi</p>
+                <p class="text-retro text-3xl font-bold" style="color: #6ba3c5;" th:text="${totalOrders} + ' Order'"></p>
             </div>
-            <div class="pixel-card p-6 border-b-4 border-b-[#e8734a]">
-                <p class="text-pixel text-[7px] text-[#9c7ac4] mb-3 uppercase">Tamu Terlayani</p>
-                <p class="text-retro text-3xl text-[#e8734a] font-bold" th:text="${totalMonsters} + ' Monster'"></p>
+            <div class="pixel-card p-6" style="border-bottom: 4px solid #e8734a;">
+                <p class="text-pixel uppercase mb-3" style="font-size: 7px; color: #9c7ac4;">Tamu Terlayani</p>
+                <p class="text-retro text-3xl font-bold" style="color: #e8734a;" th:text="${totalMonsters} + ' Monster'"></p>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-8">
             <div class="pixel-card p-8">
-                <h3 class="text-pixel text-[9px] mb-8 text-[#ffd96b] uppercase">Popularitas Elemen</h3>
+                <h3 class="text-pixel mb-8 uppercase" style="font-size: 9px; color: #ffd96b;">Popularitas Elemen</h3>
                 <div class="space-y-6">
                     <div>
                         <div class="flex justify-between text-retro text-xl mb-1">
-                            <span>Klan Api</span> <span th:text="${firePct} + '%'">0%</span>
+                            <span>🔥 Klan Api</span> <span th:text="${firePct} + '%'">0%</span>
                         </div>
                         <div class="bar-container">
                             <div class="bar-fill" th:style="'width: ' + ${firePct} + '%; background: #e8734a;'"></div>
@@ -68,7 +71,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-retro text-xl mb-1">
-                            <span>Klan Air</span> <span th:text="${waterPct} + '%'">0%</span>
+                            <span>💧 Klan Air</span> <span th:text="${waterPct} + '%'">0%</span>
                         </div>
                         <div class="bar-container">
                             <div class="bar-fill" th:style="'width: ' + ${waterPct} + '%; background: #6ba3c5;'"></div>
@@ -76,7 +79,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-retro text-xl mb-1">
-                            <span>Klan Tanah</span> <span th:text="${earthPct} + '%'">0%</span>
+                            <span>🌿 Klan Tanah</span> <span th:text="${earthPct} + '%'">0%</span>
                         </div>
                         <div class="bar-container">
                             <div class="bar-fill" th:style="'width: ' + ${earthPct} + '%; background: #85a67a;'"></div>
@@ -86,26 +89,26 @@
             </div>
 
             <div class="pixel-card p-8">
-                <h3 class="text-pixel text-[9px] mb-8 text-[#ffd96b] uppercase">Log Transaksi Terakhir</h3>
-                <div class="space-y-4 text-retro text-lg max-h-[250px] overflow-y-auto pr-2">
-                    <div th:each="t : ${history}" class="flex flex-col border-l-4 border-[#85a67a] pl-4 py-1 mb-4 bg-[#05020833]">
+                <h3 class="text-pixel mb-8 uppercase" style="font-size: 9px; color: #ffd96b;">Log Transaksi Terakhir</h3>
+                <div class="space-y-4 text-retro text-lg overflow-y-auto pr-2" style="max-height: 250px;">
+                    <div th:each="t : ${history}" class="flex flex-col pl-4 py-1 mb-4" style="border-left: 4px solid #85a67a; background: rgba(5,2,8,0.2);">
                         <div class="flex justify-between items-center">
-                            <span class="text-[#ffd96b] font-bold" th:text="${t.guest.name}">Naga</span>
-                            <span class="text-[#9c7ac4] text-sm" th:text="'#' + ${t.transId}">ID</span>
+                            <span class="font-bold" style="color: #ffd96b;" th:text="${t.name}">Naga</span>
+                            <span class="text-sm" style="color: #9c7ac4;" th:text="${t.getElement()}">FIRE</span>
                         </div>
-                        <div class="flex justify-between text-sm opacity-70">
-                            <span th:text="'Kamar ' + ${t.bookedRoom.roomId}">Kamar</span>
-                            <span th:text="'Rp ' + ${#numbers.formatDecimal(t.totalCost, 0, 'POINT', 0, 'COMMA')}">Harga</span>
+                        <div class="flex justify-between text-sm" style="opacity: 0.7;">
+                            <span th:text="'Kamar ' + ${t.roomId}">Kamar</span>
+                            <span th:text="'Rp ' + ${#numbers.formatDecimal(t.calculateTotalCost(), 0, 'POINT', 0, 'COMMA')}">Harga</span>
                         </div>
                     </div>
 
-                    <div th:if="${#lists.isEmpty(history)}" class="text-center py-10 opacity-30">
-                        <i class="fa-solid fa-folder-open text-4xl mb-4"></i>
-                        <p class="text-pixel text-[8px]">Belum ada data transaksi</p>
+                    <div th:if="${#lists.isEmpty(history)}" class="text-center py-10" style="opacity: 0.3;">
+                        <p class="text-pixel" style="font-size: 8px;">Belum ada data transaksi</p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+    <script defer th:src="@{/js/monster-inn-ui.js}"></script>
 </body>
 </html>

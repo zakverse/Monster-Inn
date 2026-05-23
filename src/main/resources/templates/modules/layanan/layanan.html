@@ -2,39 +2,41 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/monster-inn-ui.css}">
+    <th:block th:replace="~{layout/monster-style :: monster-style}"></th:block>
     <title>Layanan Tamu — Monster Inn</title>
     <style>
-        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; }
-        .pixel-card { background: #1e1825; border: 4px solid #3a2e28; box-shadow: 6px 6px 0px #000; }
+        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; margin: 0; }
         .text-pixel { font-family: 'Press Start 2P', monospace; }
         .text-retro { font-family: 'VT323', monospace; }
-        .pixel-input { background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none; }
-        .service-item { border: 3px solid #3a2e28; transition: all 0.2s; background: #1e1825; }
-        .service-item:hover { border-color: #ffd96b; }
+        .pixel-input { background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none; transition: border-color 0.15s; }
+        .pixel-input:focus { border-color: #ffd96b; }
+        .service-item { border: 3px solid #3a2e28; transition: all 0.2s; background: rgba(30,24,37,0.94); }
+        .service-item:hover { border-color: #ffd96b; transform: translate(-2px,-2px); box-shadow: 8px 8px 0 rgba(0,0,0,0.5); }
         .cart-item { border-bottom: 2px dashed #3a2e28; }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen">
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
-    <main class="flex-1 p-8 overflow-y-auto">
-        <header class="mb-10 border-b-4 border-[#3a2e28] pb-6 flex justify-between items-end">
+    <main class="flex-1 p-8 overflow-y-auto" style="margin-left: 260px;">
+        <header class="mb-10 pb-6 flex justify-between items-end" style="border-bottom: 4px solid #3a2e28;">
             <div>
-                <div class="text-[#c08800] text-xs text-pixel mb-2 uppercase">✦ Perawatan Spesifik</div>
-                <h2 class="text-pixel text-xl text-[#ffd96b]">LAYANAN TAMU</h2>
+                <div class="text-xs text-pixel mb-2 uppercase" style="color: #c08800;">✦ Perawatan Spesifik</div>
+                <h2 class="text-pixel text-xl" style="color: #ffd96b;">LAYANAN TAMU</h2>
             </div>
-            <div id="room-badge" class="hidden pixel-card px-4 py-2 bg-[#050208] text-[#9c7ac4] text-retro text-2xl uppercase">
-                Kamar: <span id="badge-info" class="text-[#ffd96b]">--</span>
+            <div id="room-badge" class="hidden pixel-card px-4 py-2 text-retro text-2xl uppercase" style="background: #050208; color: #9c7ac4;">
+                Kamar: <span id="badge-info" style="color: #ffd96b;">--</span>
             </div>
         </header>
 
         <div class="grid grid-cols-12 gap-8">
             <div class="col-span-8 space-y-6">
                 <div class="pixel-card p-6">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] block mb-4 uppercase text-center">Pilih Tamu Aktif</label>
+                    <label class="text-pixel block mb-4 uppercase text-center" style="font-size: 8px; color: #ffd96b;">Pilih Tamu Aktif</label>
                     <select id="guest-select" onchange="resetCart(); updateServices()" class="pixel-input w-full px-4 py-3 text-retro text-2xl appearance-none cursor-pointer">
                         <option value="">Pilih dari daftar...</option>
                         <option th:each="g : ${activeGuests}" 
@@ -47,32 +49,32 @@
                 </div>
 
                 <div id="service-container" class="grid grid-cols-1 gap-4">
-                    <div class="pixel-card p-20 text-center opacity-40 border-dashed">
-                        <i class="fa-solid fa-mortar-pestle text-5xl mb-4 text-[#3a2e28]"></i>
-                        <p class="text-pixel text-[8px]">Silahkan pilih tamu untuk melihat menu...</p>
+                    <div class="pixel-card p-20 text-center" style="opacity: 0.4; border-style: dashed;">
+                        <i class="fa-solid fa-mortar-pestle text-5xl mb-4" style="color: #3a2e28;"></i>
+                        <p class="text-pixel" style="font-size: 8px;">Silahkan pilih tamu untuk melihat menu...</p>
                     </div>
                 </div>
             </div>
 
             <div class="col-span-4">
-                <div class="pixel-card p-6 sticky top-0 bg-[#16111d]">
-                    <h3 class="text-pixel text-[10px] text-[#ffd96b] mb-6 border-b-2 border-[#3a2e28] pb-4">
-                        <i class="fa-solid fa-receipt mr-2"></i> RINGKASAN
+                <div class="pixel-card p-6 sticky top-0" style="background: #16111d;">
+                    <h3 class="text-pixel mb-6 pb-4" style="font-size: 10px; color: #ffd96b; border-bottom: 2px solid #3a2e28;">
+                        <i class="fa-solid fa-receipt" style="margin-right: 8px;"></i> RINGKASAN
                     </h3>
                     
-                    <div id="cart-list" class="space-y-4 mb-6 min-h-[100px]">
-                        <p class="text-retro text-xl text-gray-500 italic text-center py-4">Belum ada layanan...</p>
+                    <div id="cart-list" class="space-y-4 mb-6" style="min-height: 100px;">
+                        <p class="text-retro text-xl italic text-center py-4" style="color: #888;">Belum ada layanan...</p>
                     </div>
 
-                    <div class="border-t-4 border-[#3a2e28] pt-4 mb-6">
+                    <div class="pt-4 mb-6" style="border-top: 4px solid #3a2e28;">
                         <div class="flex justify-between items-center">
-                            <span class="text-pixel text-[8px]">TOTAL</span>
-                            <span id="total-price" class="text-retro text-3xl text-[#ffd96b]">Rp 0</span>
+                            <span class="text-pixel" style="font-size: 8px;">TOTAL</span>
+                            <span id="total-price" class="text-retro text-3xl" style="color: #ffd96b;">Rp 0</span>
                         </div>
                     </div>
 
                     <button id="confirm-btn" onclick="submitOrder()" disabled
-                            class="w-full py-4 bg-gray-700 border-b-4 border-gray-900 text-pixel text-[10px] text-gray-500 cursor-not-allowed transition-all">
+                            class="w-full py-4 text-pixel" style="font-size: 10px; background: #555; border: 4px solid #333; color: #888; cursor: not-allowed; transition: all 0.15s;">
                         KONFIRMASI PESANAN
                     </button>
                 </div>
@@ -95,7 +97,7 @@
 
             if(!element) { 
                 badge.classList.add('hidden');
-                container.innerHTML = `<div class="pixel-card p-20 text-center opacity-40 border-dashed"><p class="text-pixel text-[8px]">Silahkan pilih tamu...</p></div>`;
+                container.innerHTML = `<div class="pixel-card p-20 text-center" style="opacity:0.4; border-style:dashed;"><p class="text-pixel" style="font-size:8px;">Silahkan pilih tamu...</p></div>`;
                 return; 
             }
 
@@ -112,16 +114,18 @@
             container.innerHTML = available.map(s => `
                 <div class="service-item p-6 flex justify-between items-center">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 border-2 border-[#3a2e28] flex items-center justify-center text-[#ffd96b] bg-[#0f0b14]">
+                        <div style="width:48px; height:48px; border:2px solid #3a2e28; display:flex; align-items:center; justify-content:center; color:#ffd96b; background:#0f0b14;">
                             <i class="fa-solid ${s.icon} text-2xl"></i>
                         </div>
                         <div>
                             <h4 class="text-retro text-2xl font-bold uppercase">${s.serviceName}</h4>
-                            <p class="text-retro text-xl text-[#9c7ac4]">Rp ${s.price.toLocaleString('id-ID')}</p>
+                            <p class="text-retro text-xl" style="color:#9c7ac4;">Rp ${s.price.toLocaleString('id-ID')}</p>
                         </div>
                     </div>
                     <button onclick="addToCart('${s.serviceName}', ${s.price})" 
-                            class="px-4 py-2 bg-[#85a67a] border-b-4 border-[#4c6145] text-pixel text-[7px] text-black hover:bg-[#a3c996] active:translate-y-1 active:border-b-0 transition-all">
+                            class="px-4 py-2 text-pixel" style="font-size:7px; background:#85a67a; border:4px solid #4c6145; color:#000; cursor:pointer; transition:all 0.15s;"
+                            onmouseover="this.style.background='#a3c996'"
+                            onmouseout="this.style.background='#85a67a'">
                         + TAMBAH
                     </button>
                 </div>
@@ -149,10 +153,13 @@
             const btn = document.getElementById('confirm-btn');
             
             if(cart.length === 0) {
-                list.innerHTML = `<p class="text-retro text-xl text-gray-500 italic text-center py-4">Belum ada layanan...</p>`;
+                list.innerHTML = `<p class="text-retro text-xl italic text-center py-4" style="color:#888;">Belum ada layanan...</p>`;
                 totalEl.innerText = "Rp 0";
                 btn.disabled = true;
-                btn.className = "w-full py-4 bg-gray-700 border-b-4 border-gray-900 text-pixel text-[10px] text-gray-500 cursor-not-allowed";
+                btn.style.background = '#555';
+                btn.style.borderColor = '#333';
+                btn.style.color = '#888';
+                btn.style.cursor = 'not-allowed';
                 return;
             }
 
@@ -160,12 +167,14 @@
             list.innerHTML = cart.map((item, index) => {
                 total += item.price;
                 return `
-                    <div class="cart-item flex justify-between items-center py-2 animate-fade-in">
+                    <div class="cart-item flex justify-between items-center py-2">
                         <div>
                             <p class="text-retro text-xl font-bold uppercase">${item.name}</p>
-                            <p class="text-retro text-lg text-[#ffd96b]">Rp ${item.price.toLocaleString('id-ID')}</p>
+                            <p class="text-retro text-lg" style="color:#ffd96b;">Rp ${item.price.toLocaleString('id-ID')}</p>
                         </div>
-                        <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-300 text-sm px-2">
+                        <button onclick="removeFromCart(${index})" style="color:#e8734a; cursor:pointer; background:none; border:none; font-size:14px; padding:4px 8px; transition: color 0.15s;"
+                            onmouseover="this.style.color='#ffb570'"
+                            onmouseout="this.style.color='#e8734a'">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -174,7 +183,11 @@
 
             totalEl.innerText = "Rp " + total.toLocaleString('id-ID');
             btn.disabled = false;
-            btn.className = "w-full py-4 bg-[#d4a94a] border-b-4 border-[#8c6d2d] text-pixel text-[10px] text-black hover:bg-[#ffd96b] active:translate-y-1 active:border-b-0 transition-all shadow-[4px_4px_0px_#000]";
+            btn.style.background = '#d4a94a';
+            btn.style.borderColor = '#8c6d2d';
+            btn.style.color = '#000';
+            btn.style.cursor = 'pointer';
+            btn.style.boxShadow = '4px 4px 0 #000';
         }
 
         async function submitOrder() {
@@ -184,7 +197,6 @@
 
             if(!confirm(`Konfirmasi ${cart.length} layanan untuk Tamu di Kamar #${roomId}?`)) return;
 
-            // Kita kirim satu per satu ke backend (atau bisa rombak backend biar terima list)
             for(let item of cart) {
                 const data = { guestId, roomId, orderName: item.name, rate: item.price };
                 await fetch('/service/add', {
@@ -198,5 +210,6 @@
             resetCart();
         }
     </script>
+    <script defer th:src="@{/js/monster-inn-ui.js}"></script>
 </body>
 </html>

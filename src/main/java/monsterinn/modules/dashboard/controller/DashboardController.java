@@ -1,41 +1,45 @@
 package monsterinn.modules.dashboard.controller;
 
+import monsterinn.modules.monster.model.Monster;
 import monsterinn.modules.monster.repository.MonsterRepository;
-import monsterinn.modules.room.repository.RoomRepository;
+import monsterinn.modules.room.model.Room;
 import monsterinn.modules.room.model.RoomStatus;
+import monsterinn.modules.room.repository.RoomRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
+
 @Controller
 public class DashboardController {
 
-    private final MonsterRepository monsterRepository;
-    private final RoomRepository roomRepository;
+    @Autowired
+    private RoomRepository roomRepository;
 
-    public DashboardController(MonsterRepository monsterRepository, RoomRepository roomRepository) {
-        this.monsterRepository = monsterRepository;
-        this.roomRepository = roomRepository;
-    }
+    @Autowired
+    private MonsterRepository monsterRepository;
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
-        // Mengambil statistik langsung dari DB
-        long totalKamar = roomRepository.count();
-        long tersedia = roomRepository.findByStatus(RoomStatus.AVAILABLE).size();
-        long terisi = roomRepository.findByStatus(RoomStatus.OCCUPIED).size();
-        
-        double occupancy = (totalKamar > 0) ? ((double) terisi / totalKamar) * 100 : 0;
+        List<Room> allRooms = roomRepository.findAll();
+        long totalKamar = allRooms.size();
+        long tersedia = roomRepository.countByStatus(RoomStatus.AVAILABLE);
+        long terisi = roomRepository.countByStatus(RoomStatus.OCCUPIED);
 
-        // Kirim data ke UI
-        model.addAttribute("totalKamar", String.format("%02d", totalKamar));
-        model.addAttribute("tersedia", String.format("%02d", tersedia));
-        model.addAttribute("terisi", String.format("%02d", terisi));
-        model.addAttribute("occupancy", String.format("%.1f%%", occupancy));
-        
-        // List Tamu untuk tabel
-        model.addAttribute("activeGuests", monsterRepository.findAll());
-        model.addAttribute("activePage", "dashboard");
+        String occupancy = totalKamar > 0
+            ? String.format("%d%%", (int) ((terisi * 100.0) / totalKamar))
+            : "0%";
+
+        // Ambil semua monster yang sedang menginap (punya roomId)
+        List<Monster> activeGuests = monsterRepository.findByRoomIdIsNotNull();
+
+        model.addAttribute("totalKamar", totalKamar);
+        model.addAttribute("tersedia", tersedia);
+        model.addAttribute("terisi", terisi);
+        model.addAttribute("occupancy", occupancy);
+        model.addAttribute("activeGuests", activeGuests);
 
         return "modules/dashboard/dashboard";
     }

@@ -1,90 +1,128 @@
 package monsterinn.modules.transaction.model;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import monsterinn.modules.room.model.Room;
 import monsterinn.modules.monster.model.Monster;
+import monsterinn.modules.room.model.Room;
 
-@Data // Menggunakan Lombok agar selaras dengan kode temanmu (otomatis bikin getter setter)
-@NoArgsConstructor // Lombok untuk constructor kosong (wajib untuk JPA/Database)
-@Entity
-@Table(name = "transactions")
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class Transaction {
+    private final String transId;
+    private final String guestId;
+    private final String guestName;
+    private final String element;
+    private final String roomId;
+    private final int stayDays;
+    private final double roomTotal;
+    private final double serviceTotal;
+    private final double prepaidAmount;
+    private final double totalCost;
+    private final double paymentAmount;
+    private final double changeAmount;
+    private final LocalDateTime checkoutTime;
+    private final List<String> serviceLog;
+    private boolean paid;
 
-    @Id
-    private String transId;
+    public Transaction(Monster monster, Room room, double paymentAmount) {
+        if (monster == null) {
+            throw new IllegalArgumentException("Monster tidak boleh kosong");
+        }
+        if (room == null) {
+            throw new IllegalArgumentException("Room tidak boleh kosong");
+        }
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room bookedRoom;
-
-    @ManyToOne
-    @JoinColumn(name = "monster_id")
-    private Monster guest;
-
-    private Integer durationDays;
-    private Double cashPaid = 0.0;
-    private Double totalCost = 0.0;
-    private Double changeAmount = 0.0; 
-
-    // Constructor custom
-    public Transaction(String transId, Room bookedRoom, Monster guest, Integer durationDays) {
-        this.transId = transId;
-        this.bookedRoom = bookedRoom;
-        this.guest = guest;
-        this.durationDays = durationDays;
+        this.transId = "TX-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        this.guestId = monster.getIdMonster();
+        this.guestName = monster.getName();
+        this.element = monster.getElement();
+        this.roomId = room.getRoomId();
+        this.stayDays = monster.getStayDays();
+        this.serviceTotal = monster.getExtraCost();
+        this.roomTotal = monster.calculateTotalCost() - monster.getExtraCost();
+        this.prepaidAmount = monster.getPrepaidAmount();
+        this.totalCost = Math.max(0, monster.calculateTotalCost() - monster.getPrepaidAmount());
+        this.paymentAmount = paymentAmount;
+        this.changeAmount = Math.max(0, paymentAmount - this.totalCost);
+        this.checkoutTime = LocalDateTime.now();
+        this.serviceLog = new ArrayList<>(monster.getServiceLog());
     }
 
-    // --- METHOD IMPLEMENTASI OOP ---
-
-    public void calculateTotal() {
-        if (bookedRoom != null && guest != null) {
-            // Biaya Kamar (Memanggil getRoomRate() yang dibuat gaib oleh Lombok)
-            double roomCost = bookedRoom.getRoomRate() * durationDays;
-            
-            // Biaya Tamu (Polimorfisme: memanggil hitungan spesifik Fire/Water/Earth Monster)
-            double guestCost = guest.calculateTotalCost(); 
-            
-            this.totalCost = roomCost + guestCost;
-        }
+    public double calculateTotal() {
+        return totalCost;
     }
 
-    public boolean processPayment(Double amountPaid) {
-        calculateTotal(); // Pastikan total dihitung dulu
-        
-        if (amountPaid >= this.totalCost) {
-            this.cashPaid = amountPaid;
-            this.changeAmount = amountPaid - this.totalCost;
-            return true; // Sukses
-        }
-        return false; // Uang kurang
+    public boolean processPayment() {
+        this.paid = paymentAmount >= totalCost;
+        return paid;
     }
 
-    public String generateInvoice() {
-        if (this.cashPaid == 0.0) {
-            return "Transaksi Gagal: Tagihan belum dibayar lunas!";
-        }
-        return String.format(
-            "=== INVOICE MONSTER INN ===\n" +
-            "ID Transaksi : %s\n" +
-            "Kamar        : %s (Rp %.2f / malam)\n" +
-            "Tamu         : %s (%s)\n" +
-            "Durasi       : %d Malam\n" +
-            "---------------------------\n" +
-            "Total Biaya  : Rp %.2f\n" +
-            "Tunai        : Rp %.2f\n" +
-            "Kembalian    : Rp %.2f\n" +
-            "===========================",
-            this.transId, 
-            this.bookedRoom.getRoomId(), 
-            this.bookedRoom.getRoomRate(),
-            this.guest.getName(), 
-            this.guest.getElement(),
-            this.durationDays, 
-            this.totalCost, 
-            this.cashPaid, 
-            this.changeAmount
-        );
+    public String getTransId() {
+        return transId;
+    }
+
+    public String getGuestId() {
+        return guestId;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public String getName() {
+        return guestName;
+    }
+
+    public String getElement() {
+        return element;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public int getStayDays() {
+        return stayDays;
+    }
+
+    public double getRoomTotal() {
+        return roomTotal;
+    }
+
+    public double getServiceTotal() {
+        return serviceTotal;
+    }
+
+    public double getPrepaidAmount() {
+        return prepaidAmount;
+    }
+
+    public double getTotalCost() {
+        return totalCost;
+    }
+
+    public double calculateTotalCost() {
+        return totalCost;
+    }
+
+    public double getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    public double getChangeAmount() {
+        return changeAmount;
+    }
+
+    public LocalDateTime getCheckoutTime() {
+        return checkoutTime;
+    }
+
+    public List<String> getServiceLog() {
+        return List.copyOf(serviceLog);
+    }
+
+    public boolean isPaid() {
+        return paid;
     }
 }

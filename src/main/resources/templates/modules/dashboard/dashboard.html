@@ -3,58 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/monster-inn-ui.css}">
+    <th:block th:replace="~{layout/monster-style :: monster-style}"></th:block>
     <title>Pixel Dashboard — Monster Inn</title>
     <style>
-        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; }
-        .pixel-card { background: #1e1825; border: 4px solid #3a2e28; box-shadow: 6px 6px 0px #000; }
+        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; margin: 0; }
         .text-pixel { font-family: 'Press Start 2P', monospace; }
         .text-retro { font-family: 'VT323', monospace; }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen">
 
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
     
-    <main class="flex-1 p-8 overflow-y-auto">
-        <header class="mb-10 flex justify-between items-end border-b-4 border-[#3a2e28] pb-6">
+    <main class="flex-1 p-8 overflow-y-auto" style="margin-left: 260px;">
+        <header class="mb-10 flex justify-between items-end border-b-4 pb-6" style="border-color: #3a2e28;">
             <div>
-                <h2 class="text-pixel text-xl text-[#ffd96b] tracking-wider uppercase">Overview Gua</h2>
-                <p class="text-retro text-xl text-[#9c7ac4] mt-2">Selamat datang di terminal penginapan isekai anda.</p>
+                <h2 class="text-pixel text-xl tracking-wider uppercase" style="color: #ffd96b;">Overview Gua</h2>
+                <p class="text-retro text-xl mt-2" style="color: #9c7ac4;">Selamat datang di terminal penginapan isekai anda.</p>
             </div>
-            <div class="text-right text-[#d4a94a]">
-                <p class="text-[10px] text-pixel uppercase">Isekai Time</p>
+            <div class="text-right" style="color: #d4a94a;">
+                <p class="text-pixel uppercase" style="font-size: 10px;">Isekai Time</p>
                 <p class="text-retro text-2xl" th:text="${#calendars.format(#calendars.createNow(), 'EEEE, dd MMMM yyyy')}">Sunday, May 3, 2026</p>
             </div>
         </header>
 
         <div class="grid grid-cols-4 gap-6 mb-10">
             <div class="pixel-card p-6">
-                <p class="text-pixel text-[8px] text-[#9c7ac4] uppercase mb-3">Total Kamar</p>
+                <p class="text-pixel uppercase mb-3" style="font-size: 8px; color: #9c7ac4;">Total Kamar</p>
                 <p class="text-pixel text-2xl font-bold" th:text="${totalKamar}">00</p>
             </div>
-            <div class="pixel-card p-6 border-b-4 border-b-[#85a67a]">
-                <p class="text-pixel text-[8px] text-[#85a67a] uppercase mb-3">Tersedia</p>
-                <p class="text-pixel text-2xl text-[#b5d4a8]" th:text="${tersedia}">00</p>
+            <div class="pixel-card p-6" style="border-bottom: 4px solid #85a67a;">
+                <p class="text-pixel uppercase mb-3" style="font-size: 8px; color: #85a67a;">Tersedia</p>
+                <p class="text-pixel text-2xl" style="color: #b5d4a8;" th:text="${tersedia}">00</p>
             </div>
-            <div class="pixel-card p-6 border-b-4 border-b-[#e8734a]">
-                <p class="text-pixel text-[8px] text-[#e8734a] uppercase mb-3">Terisi</p>
-                <p class="text-pixel text-2xl text-[#ffb570]" th:text="${terisi}">00</p>
+            <div class="pixel-card p-6" style="border-bottom: 4px solid #e8734a;">
+                <p class="text-pixel uppercase mb-3" style="font-size: 8px; color: #e8734a;">Terisi</p>
+                <p class="text-pixel text-2xl" style="color: #ffb570;" th:text="${terisi}">00</p>
             </div>
-            <div class="pixel-card p-6 border-b-4 border-b-[#ffd96b]">
-                <p class="text-pixel text-[8px] text-[#ffd96b] uppercase mb-3">Occupancy Rate</p>
+            <div class="pixel-card p-6" style="border-bottom: 4px solid #ffd96b;">
+                <p class="text-pixel uppercase mb-3" style="font-size: 8px; color: #ffd96b;">Occupancy Rate</p>
                 <p class="text-pixel text-xl uppercase" th:text="${occupancy}">0%</p>
             </div>
         </div>
 
         <div class="pixel-card overflow-hidden">
-            <div class="bg-[#3a2e28] p-4 border-b-4 border-[#000]">
-                <h3 class="text-pixel text-[10px] text-[#ffd96b]">PENGHUNI SAAT INI</h3>
+            <div class="p-4" style="background: #3a2e28; border-bottom: 4px solid #000;">
+                <h3 class="text-pixel" style="font-size: 10px; color: #ffd96b;">PENGHUNI SAAT INI</h3>
             </div>
-            <table class="w-full text-left text-retro text-xl">
-                <thead class="bg-[#0f0b14]/50 text-[#9c7ac4] border-b-2 border-[#3a2c1c]">
+            <table class="w-full text-retro text-xl" style="text-align: left;">
+                <thead style="background: rgba(15,11,20,0.5); color: #9c7ac4; border-bottom: 2px solid #3a2c1c;">
                     <tr>
                         <th class="px-6 py-4">NAMA TAMU</th>
                         <th class="px-6 py-4">ELEMEN</th>
@@ -62,25 +62,28 @@
                         <th class="px-6 py-4 text-right">STATUS</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y-2 divide-[#3a2c1c]">
-                    <tr th:each="guest : ${activeGuests}" class="hover:bg-[#3a2e28]/30 transition-all">
-                        <td class="px-6 py-4 font-bold text-[#f4e8d0]" th:text="${guest.name}">Nama</td>
+                <tbody>
+                    <tr th:each="guest : ${activeGuests}" style="transition: background 0.15s;"
+                        onmouseover="this.style.background='rgba(58,46,40,0.3)'"
+                        onmouseout="this.style.background='transparent'">
+                        <td class="px-6 py-4 font-bold" style="color: #f4e8d0;" th:text="${guest.name}">Nama</td>
                         <td class="px-6 py-4" 
                             th:text="${guest.getElement()}"
-                            th:classappend="${guest.getElement() == 'FIRE' ? 'text-[#e8734a]' : (guest.getElement() == 'WATER' ? 'text-[#6ba3c5]' : 'text-[#85a67a]')}">
+                            th:style="${guest.getElement() == 'FIRE' ? 'color:#e8734a' : (guest.getElement() == 'WATER' ? 'color:#6ba3c5' : 'color:#85a67a')}">
                             ELEMENT
                         </td>
                         <td class="px-6 py-4" th:text="${guest.roomId != null ? '#' + guest.roomId : 'N/A'}">#000</td>
                         <td class="px-6 py-4 text-right">
-                            <span class="px-3 py-1 bg-[#85a67a]/20 text-[#85a67a] border-2 border-[#85a67a]">ACTIVE</span>
+                            <span class="px-3 py-1" style="background: rgba(133,166,122,0.2); color: #85a67a; border: 2px solid #85a67a;">ACTIVE</span>
                         </td>
                     </tr>
                     <tr th:if="${activeGuests.empty}">
-                        <td colspan="4" class="px-6 py-10 text-center text-[#9c7ac4] italic">Tidak ada monster yang menginap saat ini...</td>
+                        <td colspan="4" class="px-6 py-10 text-center italic" style="color: #9c7ac4;">Tidak ada monster yang menginap saat ini...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
+    <script defer th:src="@{/js/monster-inn-ui.js}"></script>
 </body>
 </html>

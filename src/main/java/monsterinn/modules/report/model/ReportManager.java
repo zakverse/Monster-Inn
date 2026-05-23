@@ -1,64 +1,64 @@
 package monsterinn.modules.report.model;
 
 import monsterinn.modules.transaction.model.Transaction;
-import java.util.ArrayList;
+import org.springframework.stereotype.Component;
+
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+@Component
 public class ReportManager {
+    private final List<Transaction> transactions = new CopyOnWriteArrayList<>();
 
-    // Relasi Komposisi: ReportManager menampung riwayat transaksi
-    private List<Transaction> history;
-
-    public ReportManager() {
-        // Inisialisasi list kosong saat objek ReportManager dibuat
-        this.history = new ArrayList<>();
-    }
-
-    // 1. Method untuk menambahkan transaksi baru ke dalam riwayat
     public void addTransaction(Transaction transaction) {
-        if (transaction != null) {
-            this.history.add(transaction);
+        if (transaction == null) {
+            throw new IllegalArgumentException("Transaction tidak boleh kosong");
         }
+        if (!transaction.isPaid()) {
+            throw new IllegalStateException("Transaksi gagal tidak boleh masuk laporan");
+        }
+        transactions.add(transaction);
     }
 
-    // 2. Method untuk mengakumulasi total pendapatan harian
-    public Double genRevenueReport() {
-        double totalRevenue = 0.0;
-        for (Transaction t : history) {
-            // Memastikan nilai tidak null sebelum ditambahkan
-            if (t.getTotalCost() != null) {
-                totalRevenue += t.getTotalCost();
-            }
-        }
-        return totalRevenue;
+    public List<Transaction> getTransactions() {
+        return List.copyOf(transactions);
     }
 
-    // 3. Method untuk mengekspor data laporan menjadi teks
-    public String exportData() {
-        StringBuilder report = new StringBuilder();
-        report.append("===================================\n");
-        report.append("     LAPORAN PENDAPATAN HARIAN     \n");
-        report.append("===================================\n");
-        report.append("Total Transaksi : ").append(history.size()).append(" tamu\n");
-        report.append("Total Omset     : Rp ").append(String.format("%.2f", genRevenueReport())).append("\n");
-        report.append("-----------------------------------\n");
-        report.append("Rincian Transaksi:\n");
-        
-        for (Transaction t : history) {
-            // Memeriksa apakah tamu dan kamar ada datanya untuk menghindari NullPointerException
-            String roomName = (t.getBookedRoom() != null) ? t.getBookedRoom().getRoomId() : "N/A";
-            String guestName = (t.getGuest() != null) ? t.getGuest().getName() : "N/A";
-            
-            report.append(String.format("- [%s] Kamar %s | %s | Rp %.2f\n", 
-                t.getTransId(), roomName, guestName, t.getTotalCost()));
-        }
-        
-        report.append("===================================");
-        return report.toString();
+    public List<Transaction> getRecentTransactions() {
+        return transactions.stream()
+            .sorted(Comparator.comparing(Transaction::getCheckoutTime).reversed())
+            .limit(10)
+            .toList();
     }
 
-    // Getter untuk mengambil array riwayat
-    public List<Transaction> getHistory() {
-        return history;
+    public double getTotalRevenue() {
+        return transactions.stream()
+            .mapToDouble(Transaction::getTotalCost)
+            .sum();
+    }
+
+    public long getTotalCheckedOutMonsters() {
+        return transactions.size();
+    }
+
+    public Map<String, Long> getElementPopularity() {
+        Map<String, Long> popularity = new LinkedHashMap<>();
+        popularity.put("FIRE", countByElement("FIRE"));
+        popularity.put("WATER", countByElement("WATER"));
+        popularity.put("EARTH", countByElement("EARTH"));
+        return popularity;
+    }
+
+    public void clear() {
+        transactions.clear();
+    }
+
+    private long countByElement(String element) {
+        return transactions.stream()
+            .filter(t -> element.equalsIgnoreCase(t.getElement()))
+            .count();
     }
 }

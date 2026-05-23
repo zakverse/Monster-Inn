@@ -15,7 +15,22 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() // Izinkan semua akses, validasi kita handle di Controller
+                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .csrf(csrf -> csrf
+                // Disable CSRF for JSON API endpoints used by fetch()
+                .ignoringRequestMatchers("/api/**", "/service/**")
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .permitAll()
             );
         return http.build();
     }

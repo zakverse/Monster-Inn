@@ -1,47 +1,41 @@
 package monsterinn.modules.room.controller;
 
 import monsterinn.modules.room.model.Room;
+import monsterinn.modules.room.model.RoomStatus;
 import monsterinn.modules.room.repository.RoomRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.util.List;
 
 @Controller
 public class RoomController {
 
-    private final RoomRepository roomRepository;
+    @Autowired
+    private RoomRepository roomRepository;
 
-    public RoomController(RoomRepository roomRepository) {
-        this.roomRepository = roomRepository;
-    }
-
-    @GetMapping("/room")
+    @GetMapping("/room/status")
     public String showRoomStatus(Model model) {
         List<Room> allRooms = roomRepository.findAll();
-
-        // Pisahin kamar berdasarkan elemen (Sesuai Enum/String di DB: FIRE, WATER, EARTH)
-        model.addAttribute("fireRooms", allRooms.stream()
-            .filter(r -> r.getElementCap().equalsIgnoreCase("FIRE")).toList());
-        
-        model.addAttribute("waterRooms", allRooms.stream()
-            .filter(r -> r.getElementCap().equalsIgnoreCase("WATER")).toList());
-        
-        model.addAttribute("earthRooms", allRooms.stream()
-            .filter(r -> r.getElementCap().equalsIgnoreCase("EARTH")).toList());
-
-        model.addAttribute("activePage", "room");
-        return "modules/room/status_kamar"; 
+        model.addAttribute("fireRooms",  roomRepository.findByElementCap("FIRE"));
+        model.addAttribute("waterRooms", roomRepository.findByElementCap("WATER"));
+        model.addAttribute("earthRooms", roomRepository.findByElementCap("EARTH"));
+        model.addAttribute("allRooms", allRooms);
+        return "modules/room/status_kamar";
     }
 
-    // Fitur tambahan buat bersihin kamar dari kotor ke tersedia
     @PostMapping("/room/clean/{id}")
-    public String cleanRoom(@PathVariable String id) {
-        Room kamar = roomRepository.findById(id).orElseThrow();
-        kamar.markCleaned();
-        roomRepository.save(kamar);
-        return "redirect:/room";
+    public String cleanRoom(@PathVariable String id, RedirectAttributes ra) {
+        roomRepository.findById(id).ifPresent(room -> {
+            room.markCleaned();
+            roomRepository.save(room);
+        });
+        ra.addFlashAttribute("successMsg", "Kamar #" + id + " selesai dibersihkan!");
+        return "redirect:/room/status";
     }
 }

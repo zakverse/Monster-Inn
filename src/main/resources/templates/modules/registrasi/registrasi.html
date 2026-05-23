@@ -3,77 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/monster-inn-ui.css}">
+    <th:block th:replace="~{layout/monster-style :: monster-style}"></th:block>
     <title>Registrasi Tamu — Monster Inn</title>
     <style>
-        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; }
-        .pixel-card { background: #1e1825; border: 4px solid #3a2e28; box-shadow: 6px 6px 0px #000; }
+        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; margin: 0; }
         .text-pixel { font-family: 'Press Start 2P', monospace; }
         .text-retro { font-family: 'VT323', monospace; }
         
-        .pixel-input { background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none; }
-        .pixel-input:focus { border-color: #ffd96b; }
+        .pixel-input { background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+        .pixel-input:focus { border-color: #ffd96b; box-shadow: 4px 4px 0 rgba(212,169,74,0.25); }
 
-        .element-card { border: 3px solid #3a2e28; transition: all 0.2s; cursor: pointer; }
-        .element-card:hover { transform: translateY(-4px); }
-        .active-fire { border-color: #e8734a; background: rgba(232, 115, 74, 0.1); }
-        .active-water { border-color: #6ba3c5; background: rgba(107, 163, 197, 0.1); }
-        .active-earth { border-color: #85a67a; background: rgba(133, 166, 122, 0.1); }
+        .element-card { border: 3px solid #3a2e28; transition: all 0.2s; cursor: pointer; background: rgba(30,24,37,0.94); }
+        .element-card:hover { transform: translateY(-4px); border-color: #ffd96b; }
+        .active-fire { border-color: #e8734a !important; background: rgba(232, 115, 74, 0.15) !important; }
+        .active-water { border-color: #6ba3c5 !important; background: rgba(107, 163, 197, 0.15) !important; }
+        .active-earth { border-color: #85a67a !important; background: rgba(133, 166, 122, 0.15) !important; }
+
+        /* Flash messages */
+        .flash-success { border: 4px solid #85a67a; background: rgba(133,166,122,0.15); padding: 14px 16px; text-align: center; margin-bottom: 16px; animation: flashIn 0.3s ease; }
+        .flash-success p { font-family: 'VT323', monospace; font-size: 22px; color: #b5d4a8; margin: 0; }
+        .flash-error { border: 4px solid #e8734a; background: rgba(232,115,74,0.15); padding: 14px 16px; text-align: center; margin-bottom: 16px; animation: flashIn 0.3s ease; }
+        .flash-error p { font-family: 'VT323', monospace; font-size: 22px; color: #ffb99f; margin: 0; }
+        @keyframes flashIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen">
 
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
-    <main class="flex-1 p-8 overflow-y-auto">
-        <header class="mb-10 border-b-4 border-[#3a2e28] pb-6">
-            <div class="text-[#c08800] text-xs text-pixel mb-2">✦ INKRIPSI TAMU BARU</div>
-            <h2 class="text-pixel text-xl text-[#ffd96b]">REGISTRASI TAMU</h2>
+    <main class="flex-1 p-8 overflow-y-auto" style="margin-left: 260px;">
+        <!-- Flash Messages -->
+        <div th:if="${successMsg != null}" class="flash-success">
+            <p>✦ <span th:text="${successMsg}">Success</span></p>
+        </div>
+        <div th:if="${errorMsg != null}" class="flash-error">
+            <p>⚠ <span th:text="${errorMsg}">Error</span></p>
+        </div>
+
+        <header class="mb-10 pb-6" style="border-bottom: 4px solid #3a2e28;">
+            <div class="text-xs text-pixel mb-2" style="color: #c08800;">✦ INKRIPSI TAMU BARU</div>
+            <h2 class="text-pixel text-xl" style="color: #ffd96b;">REGISTRASI TAMU</h2>
         </header>
 
         <form th:action="@{/registrasi/simpan}" method="post" class="max-w-4xl space-y-8">
             <div class="pixel-card p-8 space-y-8">
                 <div class="space-y-3">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase block">Nama Tamu Monster</label>
+                    <label class="text-pixel uppercase block" style="font-size: 8px; color: #ffd96b;">Nama Tamu Monster</label>
                     <input type="text" name="namaTamu" required placeholder="Gunakan aksara monster..." 
                         class="pixel-input w-full px-5 py-4 text-retro text-2xl">
                 </div>
 
                 <div class="space-y-4">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase block">Afinitas Elemen</label>
+                    <label class="text-pixel uppercase block" style="font-size: 8px; color: #ffd96b;">Afinitas Elemen</label>
                     <input type="hidden" name="elemen" id="selected-element" required>
                     <div class="grid grid-cols-3 gap-6">
-                        <div onclick="selectElement('fire')" id="el-fire" class="element-card p-6 text-center group">
-                            <i class="fa-solid fa-fire text-3xl mb-3 text-[#a08860] group-hover:text-[#e8734a]"></i>
-                            <p class="text-pixel text-[8px] uppercase">Fire</p>
+                        <div onclick="selectElement('fire')" id="el-fire" class="element-card p-6 text-center">
+                            <i class="fa-solid fa-fire text-3xl mb-3" style="color: #a08860; transition: color 0.15s;"></i>
+                            <p class="text-pixel uppercase" style="font-size: 8px;">Fire</p>
                         </div>
-                        <div onclick="selectElement('water')" id="el-water" class="element-card p-6 text-center group">
-                            <i class="fa-solid fa-droplet text-3xl mb-3 text-[#a08860] group-hover:text-[#6ba3c5]"></i>
-                            <p class="text-pixel text-[8px] uppercase">Water</p>
+                        <div onclick="selectElement('water')" id="el-water" class="element-card p-6 text-center">
+                            <i class="fa-solid fa-droplet text-3xl mb-3" style="color: #a08860; transition: color 0.15s;"></i>
+                            <p class="text-pixel uppercase" style="font-size: 8px;">Water</p>
                         </div>
-                        <div onclick="selectElement('earth')" id="el-earth" class="element-card p-6 text-center group">
-                            <i class="fa-solid fa-mountain text-3xl mb-3 text-[#a08860] group-hover:text-[#85a67a]"></i>
-                            <p class="text-pixel text-[8px] uppercase">Earth</p>
+                        <div onclick="selectElement('earth')" id="el-earth" class="element-card p-6 text-center">
+                            <i class="fa-solid fa-mountain text-3xl mb-3" style="color: #a08860; transition: color 0.15s;"></i>
+                            <p class="text-pixel uppercase" style="font-size: 8px;">Earth</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-3">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase block">Alokasi Kamar Habitat</label>
+                    <label class="text-pixel uppercase block" style="font-size: 8px; color: #ffd96b;">Alokasi Kamar Habitat</label>
                     <select id="room-select" name="noKamar" required class="pixel-input w-full px-5 py-4 text-retro text-2xl appearance-none cursor-pointer">
                         <option value="">Pilih elemen terlebih dahulu...</option>
                     </select>
                 </div>
 
                 <div class="space-y-3">
-                    <label class="text-pixel text-[8px] text-[#ffd96b] uppercase block">Deposit Batu Mulia (Rp)</label>
+                    <label class="text-pixel uppercase block" style="font-size: 8px; color: #ffd96b;">Deposit Batu Mulia (Rp)</label>
                     <input type="number" name="deposit" value="200000" class="pixel-input w-full px-5 py-4 text-retro text-2xl">
                 </div>
             </div>
 
-            <button type="submit" class="w-full py-5 bg-[#d4a94a] border-4 border-[#3a2e28] text-[#3a2e28] text-pixel text-[10px] shadow-[6px_6px_0px_#000] hover:bg-[#ffd96b]">
+            <button type="submit" class="w-full py-5 text-pixel cursor-pointer" 
+                style="font-size: 10px; background: #d4a94a; border: 4px solid #3a2e28; color: #3a2e28; box-shadow: 6px 6px 0 #000; transition: all 0.15s;"
+                onmouseover="this.style.background='#ffd96b'; this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='8px 8px 0 #000';"
+                onmouseout="this.style.background='#d4a94a'; this.style.transform='none'; this.style.boxShadow='6px 6px 0 #000';">
                 SELESAIKAN INKRIPSI CHECK-IN ▶
             </button>
         </form>
@@ -84,32 +102,39 @@
         const allAvailableRooms = /*[[${availableRooms}]]*/ [];
 
         function selectElement(type) {
-        document.getElementById('selected-element').value = type;
+            document.getElementById('selected-element').value = type.toUpperCase();
 
-        // UI Feedback
-        document.querySelectorAll('.element-card').forEach(card => card.className = 'element-card p-6 text-center group');
-        document.getElementById(`el-${type}`).classList.add(`active-${type}`);
-        
-        const select = document.getElementById('room-select');
-        select.innerHTML = '<option value="">Pilih habitat ' + type.toUpperCase() + '...</option>';
-        
-        // Filter kamar berdasarkan elementCap di DB (FIRE/WATER/EARTH)
-        const filtered = allAvailableRooms.filter(room => 
-            room.elementCap.toLowerCase() === type.toLowerCase() && !room.occupied
-        );
-
-        if (filtered.length === 0) {
-            select.innerHTML = '<option value="" disabled>Kamar penuh!</option>';
-        } else {
-            filtered.forEach(room => {
-                const opt = document.createElement('option');
-                opt.value = room.roomId; // ID Kamar yang akan dikirim ke Java
-                opt.textContent = `#${room.roomId} - ${room.elementCap} Habitat (Rp${room.roomRate})`;
-                select.appendChild(opt);
+            // UI Feedback
+            document.querySelectorAll('.element-card').forEach(card => {
+                card.className = 'element-card p-6 text-center';
+                card.querySelector('i').style.color = '#a08860';
             });
+            const activeCard = document.getElementById(`el-${type}`);
+            activeCard.classList.add(`active-${type}`);
+            const colorMap = { fire: '#e8734a', water: '#6ba3c5', earth: '#85a67a' };
+            activeCard.querySelector('i').style.color = colorMap[type];
+            
+            const select = document.getElementById('room-select');
+            select.innerHTML = '<option value="">Pilih habitat ' + type.toUpperCase() + '...</option>';
+            
+            // Filter kamar berdasarkan elementCap di DB (FIRE/WATER/EARTH)
+            const filtered = allAvailableRooms.filter(room => 
+                room.elementCap && room.elementCap.toLowerCase() === type.toLowerCase()
+            );
+
+            if (filtered.length === 0) {
+                select.innerHTML = '<option value="" disabled>Kamar penuh untuk elemen ini!</option>';
+            } else {
+                filtered.forEach(room => {
+                    const opt = document.createElement('option');
+                    opt.value = room.roomId;
+                    opt.textContent = `#${room.roomId} - ${room.elementCap} Habitat (Rp${room.roomRate})`;
+                    select.appendChild(opt);
+                });
+            }
         }
-    }
         
     </script>
+    <script defer th:src="@{/js/monster-inn-ui.js}"></script>
 </body>
 </html>
