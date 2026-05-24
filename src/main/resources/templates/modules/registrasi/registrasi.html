@@ -36,7 +36,6 @@
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
     <main class="flex-1 p-8 overflow-y-auto" style="margin-left: 260px;">
-        <!-- Flash Messages -->
         <div th:if="${successMsg != null}" class="flash-success">
             <p>✦ <span th:text="${successMsg}">Success</span></p>
         </div>
@@ -118,9 +117,12 @@
             const select = document.getElementById('room-select');
             select.innerHTML = '<option value="">Pilih habitat ' + type.toUpperCase() + '...</option>';
             
-            // Filter kamar berdasarkan elementCap di DB (FIRE/WATER/EARTH)
+            // FIX: Filter berdasarkan kesamaan elemen DAN status wajib AVAILABLE
             const filtered = allAvailableRooms.filter(room => 
-                room.elementCap && room.elementCap.toLowerCase() === type.toLowerCase()
+                room.elementCap && 
+                room.elementCap.toLowerCase() === type.toLowerCase() &&
+                room.status && 
+                room.status === 'AVAILABLE'
             );
 
             if (filtered.length === 0) {
@@ -134,7 +136,6 @@
                 });
             }
         }
-        
     </script>
     <script defer th:src="@{/js/monster-inn-ui.js}"></script>
 </body>

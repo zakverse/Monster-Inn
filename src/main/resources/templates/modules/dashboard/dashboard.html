@@ -59,7 +59,7 @@
                         <th class="px-6 py-4">NAMA TAMU</th>
                         <th class="px-6 py-4">ELEMEN</th>
                         <th class="px-6 py-4">NO. KAMAR</th>
-                        <th class="px-6 py-4 text-right">STATUS</th>
+                        <!-- <th class="px-6 py-4 text-right">STATUS</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -73,9 +73,9 @@
                             ELEMENT
                         </td>
                         <td class="px-6 py-4" th:text="${guest.roomId != null ? '#' + guest.roomId : 'N/A'}">#000</td>
-                        <td class="px-6 py-4 text-right">
+                        <!-- <td class="px-6 py-4 text-right">
                             <span class="px-3 py-1" style="background: rgba(133,166,122,0.2); color: #85a67a; border: 2px solid #85a67a;">ACTIVE</span>
-                        </td>
+                        </td> -->
                     </tr>
                     <tr th:if="${activeGuests.empty}">
                         <td colspan="4" class="px-6 py-10 text-center italic" style="color: #9c7ac4;">Tidak ada monster yang menginap saat ini...</td>
