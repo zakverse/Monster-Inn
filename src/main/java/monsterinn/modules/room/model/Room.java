@@ -19,10 +19,12 @@ public class Room {
     private double roomRate;
     private boolean isOccupied = false;
 
+    // FIX DASHBOARD MELEDAK: Hapus @Transient agar kolom status tetap dikenali oleh query Database!
     @Enumerated(EnumType.STRING)
     private RoomStatus status = RoomStatus.AVAILABLE;
 
-    @OneToOne
+    // FIX REGISTRASI TRANSIENT: Tambahkan cascade agar Monster otomatis tersimpan saat Kamar disimpan
+    @OneToOne(cascade = CascadeType.ALL) 
     @JoinColumn(name = "guest_id")
     private Monster currentGuest;
 
@@ -44,6 +46,9 @@ public class Room {
             throw new IllegalArgumentException("Elemen Monster " + guest.getElement() + 
                 " tidak cocok dengan habitat " + this.elementCap);
         }
+
+        // Sinkronisasi ID Kamar ke entitas Monster
+        guest.setRoomId(this.roomId);
 
         this.currentGuest = guest;
         this.isOccupied = true;

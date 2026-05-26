@@ -37,7 +37,7 @@ public class RegistrasiController {
                                     @RequestParam("deposit") double deposit,
                                     RedirectAttributes redirectAttributes) {
         try {
-            // 1. Ambil Kamar
+            // 1. Ambil Kamar dari Database
             Room kamar = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Kamar tidak ditemukan!"));
 
@@ -55,16 +55,18 @@ public class RegistrasiController {
 
             monsterBaru.setPrepaidAmount(deposit);
 
-            // 3. PBO Logic (Check-in & Validasi)
+            // 3. PBO Logic (Hubungkan tamu ke kamar & sinkronisasi ID)
             kamar.checkIn(monsterBaru);
 
-            // 4. Simpan (Karena sudah Cascade, cukup save Kamar saja)
+            // FIX DUPLICATE OBJECT: Cukup simpan kamarnya saja, monsternya otomatis kesimpen karena CascadeType.ALL di Room.java!
             roomRepository.save(kamar);
 
-            return "redirect:/room"; // Langsung ke Status Kamar buat liat hasil
+            // Beri feedback sukses ke user
+            redirectAttributes.addFlashAttribute("successMsg", "Inkripsi check-in berhasil! Selamat datang di Monster Inn, " + nama + "!");
+            return "redirect:/registrasi"; 
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
             return "redirect:/registrasi";
         }
     }

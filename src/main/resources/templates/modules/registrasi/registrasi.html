@@ -49,6 +49,7 @@
         </header>
 
         <form th:action="@{/registrasi/simpan}" method="post" class="max-w-4xl space-y-8">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div class="pixel-card p-8 space-y-8">
                 <div class="space-y-3">
                     <label class="text-pixel uppercase block" style="font-size: 8px; color: #ffd96b;">Nama Tamu Monster</label>
