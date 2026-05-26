@@ -6,6 +6,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/monster-inn-ui.css}">
+    
+    <!-- Amankan Token CSRF untuk Kebutuhan AJAX Fetch POST Spring Security -->
+    <meta th:name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
     <th:block th:replace="~{layout/monster-style :: monster-style}"></th:block>
     <title>Layanan Tamu — Monster Inn</title>
     <style>
@@ -17,6 +22,26 @@
         .service-item { border: 3px solid #3a2e28; transition: all 0.2s; background: rgba(30,24,37,0.94); }
         .service-item:hover { border-color: #ffd96b; transform: translate(-2px,-2px); box-shadow: 8px 8px 0 rgba(0,0,0,0.5); }
         .cart-item { border-bottom: 2px dashed #3a2e28; }
+
+        /* --- STYLE PIXEL ART CUSTOM MODAL SYSTEM --- */
+        .pixel-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 2, 8, 0.85); display: flex; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s ease-in-out;
+            backdrop-filter: blur(2px);
+        }
+        .pixel-modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .pixel-modal-box {
+            background: #16111d; border: 4px solid #3a2e28; width: 450px;
+            padding: 24px; box-shadow: 0 0 0 4px #16111d, 12px 12px 0 rgba(0,0,0,0.6);
+            transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .pixel-modal-overlay.active .pixel-modal-box { transform: scale(1); }
+        .pixel-modal-btn {
+            font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 12px 16px;
+            cursor: pointer; transition: all 0.1s; border: 4px solid #333;
+        }
+        .pixel-modal-btn:active { transform: translate(2px, 2px); box-shadow: none; }
     </style>
 </head>
 <body class="mi-app-shell flex min-h-screen">
@@ -73,7 +98,7 @@
                         </div>
                     </div>
 
-                    <button id="confirm-btn" onclick="submitOrder()" disabled
+                    <button id="confirm-btn" onclick="showCustomConfirm()" disabled
                             class="w-full py-4 text-pixel" style="font-size: 10px; background: #555; border: 4px solid #333; color: #888; cursor: not-allowed; transition: all 0.15s;">
                         KONFIRMASI PESANAN
                     </button>
@@ -82,54 +107,113 @@
         </div>
     </main>
 
-    <script th:inline="javascript">
-        const allServicesFromDB = /*[[${allServices}]]*/ [];
-        let cart = [];
+    <!-- CONTAINER CONTAINER KUSTOM POP-UP MODAL RPG -->
+    <div id="custom-modal" class="pixel-modal-overlay">
+        <div class="pixel-modal-box text-center">
+            <div id="modal-header-icon" class="text-4xl mb-4" style="color: #ffd96b;">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h4 id="modal-title" class="text-pixel mb-4 uppercase" style="font-size: 10px; color: #ffd96b;">KONFIRMASI</h4>
+            <p id="modal-message" class="text-retro text-2xl mb-8 px-2" style="color: #f4e8d0;">Apakah yakin?</p>
+            <div id="modal-actions" class="flex justify-center gap-4">
+                <!-- Tombol aksi dinamis disuntik via JS -->
+            </div>
+        </div>
+    </div>
 
-        function updateServices() {
+    <script th:inline="javascript">
+        let cart = [];
+        let confirmCallback = null;
+
+        // FUNGSI UTAMA: TRIGGER MODAL INTERAKTIF GAME UI
+        function openPixelModal(options) {
+            document.getElementById('modal-title').innerText = options.title || 'NOTIFIKASI';
+            document.getElementById('modal-message').innerText = options.message || '';
+            document.getElementById('modal-header-icon').innerHTML = `<i class="fa-solid ${options.icon || 'fa-circle-info'}"></i>`;
+            document.getElementById('modal-header-icon').style.color = options.iconColor || '#ffd96b';
+            
+            const actionContainer = document.getElementById('modal-actions');
+            actionContainer.innerHTML = '';
+
+            if (options.type === 'confirm') {
+                actionContainer.innerHTML = `
+                    <button onclick="closePixelModal(); confirmCallback(true);" class="pixel-modal-btn bg-[#85a67a] border-[#4c6145] text-black shadow-[4px_4px_0_#000]">YA</button>
+                    <button onclick="closePixelModal(); confirmCallback(false);" class="pixel-modal-btn bg-[#e8734a] border-[#8a3f25] text-black shadow-[4px_4px_0_#000]">BATAL</button>
+                `;
+            } else {
+                actionContainer.innerHTML = `
+                    <button onclick="closePixelModal();" class="pixel-modal-btn bg-[#d4a94a] border-[#8c6d2d] text-black shadow-[4px_4px_0_#000]">MENGERTI</button>
+                `;
+            }
+            document.getElementById('custom-modal').classList.add('active');
+        }
+
+        function closePixelModal() {
+            document.getElementById('custom-modal').classList.remove('active');
+        }
+
+        async function updateServices() {
             const select = document.getElementById('guest-select');
             const opt = select.options[select.selectedIndex];
             const container = document.getElementById('service-container');
             const badge = document.getElementById('room-badge');
             
-            const element = opt.getAttribute('data-element');
-            const roomId = opt.getAttribute('data-room');
-
-            if(!element) { 
+            if (!opt || !select.value) { 
                 badge.classList.add('hidden');
                 container.innerHTML = `<div class="pixel-card p-20 text-center" style="opacity:0.4; border-style:dashed;"><p class="text-pixel" style="font-size:8px;">Silahkan pilih tamu...</p></div>`;
                 return; 
             }
 
+            const element = opt.getAttribute('data-element');
+            const roomId = opt.getAttribute('data-room');
+
             badge.classList.remove('hidden');
             document.getElementById('badge-info').innerText = `#${roomId} (${element})`;
+            container.innerHTML = `<div class="text-center py-10 text-retro text-2xl animate-pulse" style="color: #ffd96b;">✦ Mengambil berkas menu dari database... ✦</div>`;
 
-            const available = allServicesFromDB.filter(s => s.targetElement.toUpperCase() === element.toUpperCase());
-            
-            if(available.length === 0) {
-                container.innerHTML = `<div class="pixel-card p-10 text-center text-retro text-2xl">Menu khusus elemen ${element} belum tersedia.</div>`;
-                return;
+            try {
+                const res = await fetch(`/layanan/api/menu/${element}`);
+                const allServicesFromDB = await res.json();
+                
+                const available = allServicesFromDB.filter(s => {
+                    const target = s.target_element || s.targetElement || s.elementTarget || s.element || '';
+                    return target.toUpperCase() === element.toUpperCase();
+                });
+                
+                if(!available || available.length === 0) {
+                    container.innerHTML = `<div class="pixel-card p-10 text-center text-retro text-2xl" style="color: #e8734a;">Menu khusus perawatan elemen ${element} belum didaftarkan di database.</div>`;
+                    return;
+                }
+
+                container.innerHTML = available.map(s => {
+                    const nominalHarga = s.price || s.rate || s.serviceRate || 0;
+                    const namaMenu = s.service_name || s.serviceName || s.namaLayanan || 'Layanan Tamu';
+                    const iconKlan = s.icon || 'fa-magic';
+                    return `
+                        <div class="service-item p-6 flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <div style="width:48px; height:48px; border:2px solid #3a2e28; display:flex; align-items:center; justify-content:center; color:#ffd96b; background:#0f0b14;">
+                                    <i class="fa-solid ${iconKlan} text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-retro text-2xl font-bold uppercase">${namaMenu}</h4>
+                                    <p class="text-retro text-xl" style="color:#9c7ac4;">Rp ${nominalHarga.toLocaleString('id-ID')}</p>
+                                </div>
+                            </div>
+                            <button onclick="addToCart('${namaMenu}', ${nominalHarga})" 
+                                    class="px-4 py-2 text-pixel" style="font-size:7px; background:#85a67a; border:4px solid #4c6145; color:#000; cursor:pointer; transition:all 0.15s;"
+                                    onmouseover="this.style.background='#a3c996'"
+                                    onmouseout="this.style.background='#85a67a'">
+                                + TAMBAH
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error("Gagal memuat menu layanan:", error);
+                container.innerHTML = `<div class="pixel-card p-10 text-center text-retro text-2xl" style="color: #e8734a;">Gagal menyambung ke server inkripsi.</div>`;
             }
-
-            container.innerHTML = available.map(s => `
-                <div class="service-item p-6 flex justify-between items-center">
-                    <div class="flex items-center gap-4">
-                        <div style="width:48px; height:48px; border:2px solid #3a2e28; display:flex; align-items:center; justify-content:center; color:#ffd96b; background:#0f0b14;">
-                            <i class="fa-solid ${s.icon} text-2xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-retro text-2xl font-bold uppercase">${s.serviceName}</h4>
-                            <p class="text-retro text-xl" style="color:#9c7ac4;">Rp ${s.price.toLocaleString('id-ID')}</p>
-                        </div>
-                    </div>
-                    <button onclick="addToCart('${s.serviceName}', ${s.price})" 
-                            class="px-4 py-2 text-pixel" style="font-size:7px; background:#85a67a; border:4px solid #4c6145; color:#000; cursor:pointer; transition:all 0.15s;"
-                            onmouseover="this.style.background='#a3c996'"
-                            onmouseout="this.style.background='#85a67a'">
-                        + TAMBAH
-                    </button>
-                </div>
-            `).join('');
         }
 
         function addToCart(name, price) {
@@ -160,6 +244,8 @@
                 btn.style.borderColor = '#333';
                 btn.style.color = '#888';
                 btn.style.cursor = 'not-allowed';
+                btn.style.boxShadow = 'none';
+                btn.style.transform = 'none';
                 return;
             }
 
@@ -184,30 +270,64 @@
             totalEl.innerText = "Rp " + total.toLocaleString('id-ID');
             btn.disabled = false;
             btn.style.background = '#d4a94a';
-            btn.style.borderColor = '#8c6d2d';
-            btn.style.color = '#000';
+            btn.style.borderColor = '#333';
+            btn.style.color = '#3a2e28';
             btn.style.cursor = 'pointer';
             btn.style.boxShadow = '4px 4px 0 #000';
         }
 
+        // TRIGGER DI TOMBOL UTAMA: Menampilkan Modal Confirm Bergaya Game RPG
+        function showCustomConfirm() {
+            const select = document.getElementById('guest-select');
+            const roomId = select.options[select.selectedIndex].getAttribute('data-room');
+
+            confirmCallback = function(isConfirmed) {
+                if (isConfirmed) {
+                    submitOrder(); // Gas kirim pesanan kalau klik 'YA'
+                }
+            };
+
+            openPixelModal({
+                type: 'confirm',
+                title: '✦ KONFIRMASI NOTA ✦',
+                message: `Daftarkan ${cart.length} item perawatan spesifik untuk Tamu di Kamar #${roomId}?`,
+                icon: 'fa-circle-question',
+                iconColor: '#9c7ac4'
+            });
+        }
+
+        // PROSES TRANSAKSI BACKEND AJAX FETCH
         async function submitOrder() {
             const select = document.getElementById('guest-select');
             const roomId = select.options[select.selectedIndex].getAttribute('data-room');
             const guestId = select.value;
 
-            if(!confirm(`Konfirmasi ${cart.length} layanan untuk Tamu di Kamar #${roomId}?`)) return;
+            const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+            const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
 
             for(let item of cart) {
                 const data = { guestId, roomId, orderName: item.name, rate: item.price };
-                await fetch('/service/add', {
+                await fetch('/layanan/add', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        [header]: token
+                    },
                     body: JSON.stringify(data)
                 });
             }
 
-            alert("✦ SEMUA LAYANAN BERHASIL DICATAT KE TAGIHAN! ✦");
+            // MODAL BERHASIL: Ganti alert() lama dengan Alert Kustom Pixel Art Sukses!
+            openPixelModal({
+                type: 'alert',
+                title: '✦ TRANSAKSI BERHASIL ✦',
+                message: 'Semua berkas layanan perawatan spesifik berhasil dicatat ke tagihan induk kamar!',
+                icon: 'fa-square-check',
+                iconColor: '#85a67a'
+            });
+
             resetCart();
+            updateServices(); 
         }
     </script>
     <script defer th:src="@{/js/monster-inn-ui.js}"></script>

@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/monster-inn-ui.css}">
+    
+    <meta th:name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
     <th:block th:replace="~{layout/monster-style :: monster-style}"></th:block>
     <title>Checkout &amp; Tagihan — Monster Inn</title>
     <style>
@@ -19,6 +23,27 @@
             box-shadow: 12px 12px 0 rgba(0,0,0,0.5);
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
+
+        /* --- STYLE PIXEL ART CUSTOM MODAL SYSTEM --- */
+        .pixel-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 2, 8, 0.85); display: flex; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s ease-in-out;
+            backdrop-filter: blur(2px);
+        }
+        .pixel-modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .pixel-modal-box {
+            background: #16111d; border: 4px solid #3a2e28; width: 450px;
+            padding: 24px; box-shadow: 0 0 0 4px #16111d, 12px 12px 0 rgba(0,0,0,0.6);
+            transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #f4e8d0;
+        }
+        .pixel-modal-overlay.active .pixel-modal-box { transform: scale(1); }
+        .pixel-modal-btn {
+            font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 12px 16px;
+            cursor: pointer; transition: all 0.1s; border: 4px solid #333;
+        }
+        .pixel-modal-btn:active { transform: translate(2px, 2px); box-shadow: none; }
     </style>
 </head>
 <body class="mi-app-shell flex min-h-screen">
@@ -75,7 +100,7 @@
                         <p id="checkout-error" class="hidden text-retro text-xl mt-3" style="color: #a74520;"></p>
                     </div>
 
-                    <button onclick="confirmCheckout()" class="w-full mt-8 py-4 text-pixel cursor-pointer" 
+                    <button onclick="showCheckoutConfirm()" class="w-full mt-8 py-4 text-pixel cursor-pointer" 
                         style="font-size: 8px; background: #3a2e28; color: #f4e8d0; border: 4px solid #000; transition: all 0.15s; box-shadow: 4px 4px 0 #000;"
                         onmouseover="this.style.background='#050208'; this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='6px 6px 0 #000';"
                         onmouseout="this.style.background='#3a2e28'; this.style.transform='none'; this.style.boxShadow='4px 4px 0 #000';">
@@ -86,9 +111,53 @@
         </div>
     </main>
 
-    <script>
+    <div id="custom-modal" class="pixel-modal-overlay">
+        <div class="pixel-modal-box text-center">
+            <div id="modal-header-icon" class="text-4xl mb-4">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h4 id="modal-title" class="text-pixel mb-4 uppercase" style="font-size: 10px; color: #ffd96b;">SYSTEM</h4>
+            <p id="modal-message" class="text-retro text-2xl mb-8 px-2"></p>
+            <div id="modal-actions" class="flex justify-center gap-4">
+                </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
         let selectedGuestId = null;
         let latestGrandTotal = 0;
+        let confirmCallback = null;
+
+        // FUNGSI UTAMA: Cetak modal HUD game RPG dengan deteksi parameter redirect otomatis
+        function openPixelModal(options) {
+            document.getElementById('modal-title').innerText = options.title || 'NOTIFIKASI';
+            document.getElementById('modal-message').innerText = options.message || '';
+            document.getElementById('modal-header-icon').innerHTML = `<i class="fa-solid ${options.icon || 'fa-circle-info'}"></i>`;
+            document.getElementById('modal-header-icon').style.color = options.iconColor || '#ffd96b';
+            
+            const actionContainer = document.getElementById('modal-actions');
+            actionContainer.innerHTML = '';
+
+            if (options.type === 'confirm') {
+                actionContainer.innerHTML = `
+                    <button onclick="closePixelModal(); confirmCallback(true);" class="pixel-modal-btn bg-[#85a67a] border-[#4c6145] text-black shadow-[4px_4px_0_#000]">YA</button>
+                    <button onclick="closePixelModal(); confirmCallback(false);" class="pixel-modal-btn bg-[#e8734a] border-[#8a3f25] text-black shadow-[4px_4px_0_#000]">BATAL</button>
+                `;
+            } else {
+                // FIX CRITICAL REDIRECT: Lempar halaman ke /laporan pas tombol MENGERTI diklik
+                actionContainer.innerHTML = `
+                    <button onclick="closePixelModal(); ${options.redirect ? `window.location.href='${options.redirect}';` : ''}" 
+                            class="pixel-modal-btn bg-[#d4a94a] border-[#8c6d2d] text-black shadow-[4px_4px_0_#000]">
+                        MENGERTI
+                    </button>
+                `;
+            }
+            document.getElementById('custom-modal').classList.add('active');
+        }
+
+        function closePixelModal() {
+            document.getElementById('custom-modal').classList.remove('active');
+        }
 
         async function loadInvoice() {
             const guestId = document.getElementById('checkout-select').value;
@@ -114,9 +183,9 @@
             document.getElementById('inv-services').innerHTML = servicesHtml || '<p class="text-sm" style="font-style:italic;">Tanpa layanan tambahan</p>';
         }
 
-        async function confirmCheckout() {
+        // TRIGGER SAAT KLIK BUTTON UTAMA: Jalankan konfirmasi kustom bertema klan api
+        function showCheckoutConfirm() {
             const guestId = selectedGuestId || document.getElementById('checkout-select').value;
-            const paymentAmount = Number(document.getElementById('payment-amount').value || 0);
             const errorEl = document.getElementById('checkout-error');
 
             if(!guestId) {
@@ -125,21 +194,62 @@
                 return;
             }
 
-            if(!confirm("Proses checkout? Data monster akan dihapus dan kamar dikosongkan.")) return;
+            confirmCallback = function(isConfirmed) {
+                if (isConfirmed) {
+                    executeCheckoutBackend();
+                }
+            };
+
+            openPixelModal({
+                type: 'confirm',
+                title: '✦ KONFIRMASI KELUAR ✦',
+                message: 'Proses berkas checkout? Data rekap log monster akan diamankan ke laporan harian dan kamar akan dikosongkan.',
+                icon: 'fa-triangle-exclamation',
+                iconColor: '#e8734a'
+            });
+        }
+
+        // PROSES KIRIM TRANSAKSI DATABASE
+        async function executeCheckoutBackend() {
+            const guestId = selectedGuestId || document.getElementById('checkout-select').value;
+            const paymentAmount = Number(document.getElementById('payment-amount').value || 0);
+            const errorEl = document.getElementById('checkout-error');
+
+            const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+            const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
 
             const res = await fetch(`/api/checkout/confirm/${guestId}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    [header]: token
+                },
                 body: JSON.stringify({ paymentAmount })
             });
+            
             const result = await res.json().catch(() => ({}));
+            
             if(res.ok) {
-                alert("✦ Checkout Berhasil! Monster telah terbang pulang. ✦");
-                window.location.href = "/laporan";
+                // MODAL SUKSES: Kirim parameter redirect menuju rute laporan harian operasional kelompok lu
+                openPixelModal({
+                    type: 'alert',
+                    title: '✦ CHECKOUT BERHASIL ✦',
+                    message: 'Struk transaksi diamankan! Monster telah terbang kembali dengan selamat menuju gerbang dimensi asal.',
+                    icon: 'fa-square-check',
+                    iconColor: '#85a67a',
+                    redirect: '/laporan' // Otomatis redirect pas mencet tombol MENGERTI!
+                });
             } else {
                 errorEl.innerText = result.message || "Pembayaran kurang atau checkout gagal.";
                 errorEl.classList.remove('hidden');
-                alert("⚠ Gagal checkout. Silakan coba lagi.");
+                
+                openPixelModal({
+                    type: 'alert',
+                    title: '⚠ GAGAL OPERASIONAL ⚠',
+                    message: `Eror inkripsi: ${result.message || 'Nominal pembayaran emas kurang atau data tidak valid.'}`,
+                    icon: 'fa-circle-xmark',
+                    iconColor: '#a74520'
+                });
             }
         }
     </script>

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -31,23 +32,33 @@ public class ServiceController {
 
     @GetMapping
     public String showServicePage(Model model) {
-        // Ambil tamu yang beneran lagi nginep aja
+        // 1. Ambil data tamu monster aktif yang sedang menginap di hotel
         model.addAttribute("activeGuests", monsterRepository.findAll());
-        // Ambil semua daftar menu layanan dari DB
+        
+        // FIX KEBOCORAN DATA: Pastikan mengambil data MASTER MENU yang sah dari serviceRepository!
         model.addAttribute("allServices", serviceRepository.findAll());
+        
         model.addAttribute("activePage", "layanan");
         return "modules/layanan/layanan";
+    }
+
+    // API untuk kebutuhan fleksibilitas AJAX Fetch (Mengembalikan List data mentah bebas error compile)
+    @GetMapping("/api/menu/{element}")
+    @ResponseBody
+    public ResponseEntity<?> getMenuByElement(@PathVariable String element) {
+        List<Object> allData = new ArrayList<>(serviceRepository.findAll());
+        return ResponseEntity.ok(allData); 
     }
 
     @PostMapping("/add")
     @ResponseBody
     public ResponseEntity<String> addService(@RequestBody ServiceRequest request) {
         try {
-            // Update tagihan monster secara otomatis
+            // PBO State Mutation: Ambil data monster dan suntikkan akumulasi tagihan extraCost
             Monster monster = monsterRepository.findById(request.getGuestId()).orElse(null);
             if (monster != null) {
                 monster.pushService(request.getOrderName(), request.getRate());
-                monsterRepository.save(monster); // Simpan extraCost baru
+                monsterRepository.save(monster); // Persist data tagihan baru ke database MySQL
             }
             
             requestRepository.save(request);

@@ -13,10 +13,15 @@ public class ServiceEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(name = "service_name") // SINKRONKAN DENGAN KOLOM MYSQL
     private String serviceName;
+    
     private Double price;
-    private String targetElement; // Api, Air, Tanah
-    private String icon; // fa-fire, fa-droplet, dll
+    
+    @Column(name = "target_element") // SINKRONKAN DENGAN KOLOM MYSQL
+    private String targetElement; 
+    
+    private String icon; 
 
     public ServiceEntity(String serviceName, Double price, String targetElement, String icon) {
         this.serviceName = serviceName;
