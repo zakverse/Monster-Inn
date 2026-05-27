@@ -36,7 +36,7 @@ public class TransactionController {
         return "modules/transaction/checkout"; 
     }
 
-    // 2. API untuk Ambil Info Tagihan (Dipakai JS)
+    // 2. API untuk Ambil Info Tagihan (Dipakai JS Frontend)
     @GetMapping("/api/checkout-info/{id}")
     @ResponseBody
     public ResponseEntity<?> getCheckoutInfo(@PathVariable String id) {
@@ -58,13 +58,13 @@ public class TransactionController {
         data.put("prepaid", monster.getPrepaidAmount());
         data.put("serviceLog", monster.getServiceLog());
         
-        // Rumus Induk Tagihan: (Sewa Kamar * Hari) + Biaya Layanan - Uang Muka
+        // Rumus Induk Tagihan: (Sewa Kamar * Hari) + Biaya Layanan Extra - Uang Muka Deposit
         data.put("grandTotal", (room.getRoomRate() * monster.getStayDays()) + monster.getExtraCost() - monster.getPrepaidAmount());
 
         return ResponseEntity.ok(data);
     }
 
-    // 3. API untuk Konfirmasi Checkout (Sistem Validasi Lunas Ketat Keamanan Ganda)
+    // 3. API untuk Konfirmasi Checkout (Sistem Keamanan Ganda Pencegah Status Belum Lunas)
     @PostMapping("/api/checkout/confirm/{id}")
     @ResponseBody
     public ResponseEntity<?> confirmCheckout(@PathVariable String id, @RequestBody Map<String, Object> payload) {
@@ -85,30 +85,33 @@ public class TransactionController {
         // Ambil nominal bayar dari request payload JS frontend (default ke 0 jika kosong)
         double inputPayment = payload.get("paymentAmount") != null ? Double.parseDouble(payload.get("paymentAmount").toString()) : 0;
 
-        // CALCULATE GRAND TOTAL BERDASARKAN LOGIC INDUK DI BACKEND
+        // CALCULATE GRAND TOTAL BERDASARKAN FORMULA UTAMA DI BACKEND
         double grandTotal = (room.getRoomRate() * monster.getStayDays()) + monster.getExtraCost() - monster.getPrepaidAmount();
 
-        // FIX SAKTI MUTLAK: Blokir di backend jika kasir nekat bypass nominal uang kurang!
+        // VALIDASI MUTLAK: Tolak transaksi di level server jika nominal emas kurang dari total tagihan induk!
         if (inputPayment < grandTotal) {
             Map<String, String> error = new HashMap<>();
             error.put("message", "⚠ Gagal checkout: Uang pembayaran kurang dari total tagihan induk! Tamu dilarang keluar.");
             return ResponseEntity.badRequest().body(error);
         }
 
-        // Bikin riwayat baru memanfaatkan Constructor utama model Transaction lu
+        // Instansiasi objek transaksi baru memanfaatkan Constructor utama model Transaction lu
         Transaction riwayatBaru = new Transaction(monster, room, inputPayment);
-        riwayatBaru.processPayment(); // Mengubah state boolean isPaid menjadi TRUE secara otomatis
+        
+        // REKAYASA PENYELAMATAN STATE: Panggil method internal dan paksa boolean paid bernilai TRUE
+        riwayatBaru.processPayment(); 
+        riwayatBaru.setPaid(true); // <--- KUNCI LUNAS DI SINI BIAR TIDAK DI-RESET KEMBALI JADI FALSE OLEH HIBERNATE
 
-        // Simpan nota ke database laporan permanen
+        // Simpan nota permanen ke database MySQL laporan
         transactionRepo.save(riwayatBaru);
 
-        // Update Kamar: Kosongkan tamu dan set status jadi DIRTY (Kotor)
+        // Update Kamar: Kosongkan kamar dan alihkan status operasional menjadi DIRTY (Kotor)
         room.setOccupied(false);
         room.setCurrentGuest(null);
         room.setStatus(RoomStatus.DIRTY);
         roomRepo.save(room);
 
-        // Hapus data naga dari tabel aktif (Monsters)
+        // Hapus data naga/monster dari tabel aktif hunian (Monsters)
         monsterRepo.delete(monster);
 
         Map<String, String> response = new HashMap<>();

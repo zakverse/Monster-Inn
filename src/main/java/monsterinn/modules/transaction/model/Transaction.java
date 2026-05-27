@@ -39,7 +39,7 @@ public class Transaction {
     
     private boolean paid;
 
-    // Constructor Utama untuk logic pas checkout
+    // Constructor Utama untuk logic pas checkout (FIX INDUK: Langsung set lunas di konstruktor)
     public Transaction(Monster monster, Room room, double paymentAmount) {
         if (monster == null) throw new IllegalArgumentException("Monster tidak boleh kosong");
         if (room == null) throw new IllegalArgumentException("Room tidak boleh kosong");
@@ -58,9 +58,10 @@ public class Transaction {
         this.changeAmount = Math.max(0, paymentAmount - this.totalCost);
         this.checkoutTime = LocalDateTime.now();
         this.serviceLog = new ArrayList<>(monster.getServiceLog());
+        
+        // Pemicu mutlak status kelunasan saat objek memori pertama kali dibangun
+        this.paid = paymentAmount >= this.totalCost;
     }
-
-
 
     public double calculateTotal() {
         return totalCost;
@@ -73,6 +74,11 @@ public class Transaction {
     public boolean processPayment() {
         this.paid = paymentAmount >= totalCost;
         return paid;
+    }
+
+    // FIX SAKTI GETTER FOR JPA: Amankan kembalian nilai boolean paid agar dibaca valid oleh Hibernate & Excel
+    public boolean isPaid() {
+        return this.paid;
     }
 
     // Custom getter karena namanya beda dengan field variabel
