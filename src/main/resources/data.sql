@@ -1,3 +1,7 @@
+--=============================================
+-- DATA SEEDER SCRIPT
+----=============================================
+
 -- ============================================
 -- Monster Inn — Initial Seed Data
 -- 9 Rooms: 3 Fire, 3 Water, 3 Earth
@@ -41,3 +45,32 @@ ON DUPLICATE KEY UPDATE room_id = room_id;
 INSERT INTO rooms (room_id, element_cap, room_rate, is_occupied, status, guest_id)
 VALUES ('E-303', 'EARTH', 155000, false, 'AVAILABLE', NULL)
 ON DUPLICATE KEY UPDATE room_id = room_id;
+
+
+-- ==========================================
+-- Master Data Menu Perawatan Spesifik (Services)
+-- ==========================================
+
+INSERT INTO services (id, icon, price, service_name, target_element)
+VALUES (1, 'fa-fire', 60000, 'Magma Injection', 'FIRE')
+ON DUPLICATE KEY UPDATE id = id;
+
+INSERT INTO services (id, icon, price, service_name, target_element)
+VALUES (2, 'fa-hot-tub-person', 75000, 'Lava Bath', 'FIRE')
+ON DUPLICATE KEY UPDATE id = id;
+
+INSERT INTO services (id, icon, price, service_name, target_element)
+VALUES (3, 'fa-droplet', 70000, 'Aquatic Nutrient', 'WATER')
+ON DUPLICATE KEY UPDATE id = id;
+
+INSERT INTO services (id, icon, price, service_name, target_element)
+VALUES (4, 'fa-cloud-showers-heavy', 45000, 'Deep Sea Mist', 'WATER')
+ON DUPLICATE KEY UPDATE id = id;
+
+INSERT INTO services (id, icon, price, service_name, target_element)
+VALUES (5, 'fa-leaf', 50000, 'Soil Nutrient', 'EARTH')
+ON DUPLICATE KEY UPDATE id = id;
+
+INSERT INTO services (id, icon, price, service_name, target_element)
+VALUES (6, 'fa-hand-holding-drop', 40000, 'Root Massage', 'EARTH')
+ON DUPLICATE KEY UPDATE id = id;

@@ -58,13 +58,13 @@ public class TransactionController {
         data.put("prepaid", monster.getPrepaidAmount());
         data.put("serviceLog", monster.getServiceLog());
         
-        // Rumus: (Sewa Kamar * Hari) + Biaya Layanan - Uang Muka
+        // Rumus Induk Tagihan: (Sewa Kamar * Hari) + Biaya Layanan - Uang Muka
         data.put("grandTotal", (room.getRoomRate() * monster.getStayDays()) + monster.getExtraCost() - monster.getPrepaidAmount());
 
         return ResponseEntity.ok(data);
     }
 
-    // 3. API untuk Konfirmasi Checkout (Gunakan Constructor Utama Model Transaction)
+    // 3. API untuk Konfirmasi Checkout (Sistem Validasi Lunas Ketat Keamanan Ganda)
     @PostMapping("/api/checkout/confirm/{id}")
     @ResponseBody
     public ResponseEntity<?> confirmCheckout(@PathVariable String id, @RequestBody Map<String, Object> payload) {
@@ -82,12 +82,22 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(error);
         }
 
-        // Ambil nominal bayar dari request payload JS frontend (default ke total biaya jika kosong)
+        // Ambil nominal bayar dari request payload JS frontend (default ke 0 jika kosong)
         double inputPayment = payload.get("paymentAmount") != null ? Double.parseDouble(payload.get("paymentAmount").toString()) : 0;
 
-        // FIX SAKTI: Bikin riwayat baru langsung memanfaatkan Constructor utama model Transaction lu!
+        // CALCULATE GRAND TOTAL BERDASARKAN LOGIC INDUK DI BACKEND
+        double grandTotal = (room.getRoomRate() * monster.getStayDays()) + monster.getExtraCost() - monster.getPrepaidAmount();
+
+        // FIX SAKTI MUTLAK: Blokir di backend jika kasir nekat bypass nominal uang kurang!
+        if (inputPayment < grandTotal) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "⚠ Gagal checkout: Uang pembayaran kurang dari total tagihan induk! Tamu dilarang keluar.");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        // Bikin riwayat baru memanfaatkan Constructor utama model Transaction lu
         Transaction riwayatBaru = new Transaction(monster, room, inputPayment);
-        riwayatBaru.processPayment(); // Validasi status lunas otomatis di model
+        riwayatBaru.processPayment(); // Mengubah state boolean isPaid menjadi TRUE secara otomatis
 
         // Simpan nota ke database laporan permanen
         transactionRepo.save(riwayatBaru);

@@ -14,7 +14,7 @@
     <title>Checkout &amp; Tagihan — Monster Inn</title>
     <style>
         body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; margin: 0; }
-        .text-pixel { font-family: 'Press Start 2P', monospace; }
+        .text-pixel { font-family: 'Press Start 2P', monospace; font-size: 8px; }
         .text-retro { font-family: 'VT323', monospace; }
         .pixel-input { background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none; transition: border-color 0.15s; }
         .pixel-input:focus { border-color: #ffd96b; }
@@ -52,13 +52,13 @@
     <main class="flex-1 p-8 overflow-y-auto" style="margin-left: 260px;">
         <header class="mb-10 pb-6" style="border-bottom: 4px solid #3a2e28;">
             <div class="text-xs text-pixel mb-2 uppercase" style="color: #c08800;">✦ Proses Pembayaran</div>
-            <h2 class="text-pixel text-xl" style="color: #ffd96b;">CHECKOUT &amp; TAGIHAN</h2>
+            <h2 class="text-pixel text-xl" style="color: #ffd96b; font-size: 20px;">CHECKOUT &amp; TAGIHAN</h2>
         </header>
 
         <div class="grid grid-cols-12 gap-8">
             <div class="col-span-5 space-y-6">
                 <div class="pixel-card p-6">
-                    <label class="text-pixel block mb-4 uppercase" style="font-size: 8px; color: #ffd96b;">Siapa yang akan keluar?</label>
+                    <label class="text-pixel block mb-4 uppercase" style="color: #ffd96b;">Siapa yang akan keluar?</label>
                     <select id="checkout-select" onchange="loadInvoice()" class="pixel-input w-full px-4 py-3 text-retro text-2xl appearance-none cursor-pointer">
                         <option value="">Pilih tamu...</option>
                         <option th:each="g : ${activeGuests}" th:value="${g.idMonster}" th:text="${g.name + ' (#' + g.roomId + ')'}"></option>
@@ -72,7 +72,7 @@
 
             <div class="col-span-7">
                 <div id="invoice-ui" class="invoice-box hidden">
-                    <h3 class="text-pixel text-center mb-6 pb-4" style="font-size: 10px; border-bottom: 2px dashed #3a2e28;">STRUK TAGIHAN</h3>
+                    <h3 class="text-pixel text-center mb-6 pb-4" style="font-size: 10px; border-bottom: 2px dashed #3a2e28; color: #3a2e28;">STRUK TAGIHAN</h3>
                     
                     <div class="space-y-4 text-retro text-2xl">
                         <div class="flex justify-between">
@@ -93,15 +93,15 @@
                     </div>
 
                     <div class="mt-6">
-                        <label for="payment-amount" class="text-pixel block mb-3 uppercase" style="font-size: 8px; color: #3a2e28;">Uang Pembayaran</label>
+                        <label for="payment-amount" class="text-pixel block mb-3 uppercase" style="color: #3a2e28;">Uang Pembayaran</label>
                         <input id="payment-amount" type="number" min="0" step="1000"
                             class="pixel-input w-full px-4 py-3 text-retro text-2xl"
                             style="background: #fffdf4; color: #3a2e28; border-color: #3a2e28;">
-                        <p id="checkout-error" class="hidden text-retro text-xl mt-3" style="color: #a74520;"></p>
+                        <p id="checkout-error" class="hidden text-retro text-2xl font-bold mt-3 animate-pulse" style="color: #a74520;"></p>
                     </div>
 
                     <button onclick="showCheckoutConfirm()" class="w-full mt-8 py-4 text-pixel cursor-pointer" 
-                        style="font-size: 8px; background: #3a2e28; color: #f4e8d0; border: 4px solid #000; transition: all 0.15s; box-shadow: 4px 4px 0 #000;"
+                        style="background: #3a2e28; color: #f4e8d0; border: 4px solid #000; transition: all 0.15s; box-shadow: 4px 4px 0 #000;"
                         onmouseover="this.style.background='#050208'; this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='6px 6px 0 #000';"
                         onmouseout="this.style.background='#3a2e28'; this.style.transform='none'; this.style.boxShadow='4px 4px 0 #000';">
                         PROSES CHECKOUT ▶
@@ -116,7 +116,7 @@
             <div id="modal-header-icon" class="text-4xl mb-4">
                 <i class="fa-solid fa-circle-question"></i>
             </div>
-            <h4 id="modal-title" class="text-pixel mb-4 uppercase" style="font-size: 10px; color: #ffd96b;">SYSTEM</h4>
+            <h4 id="modal-title" class="text-pixel mb-4 uppercase" style="color: #ffd96b;">SYSTEM</h4>
             <p id="modal-message" class="text-retro text-2xl mb-8 px-2"></p>
             <div id="modal-actions" class="flex justify-center gap-4">
                 </div>
@@ -128,7 +128,6 @@
         let latestGrandTotal = 0;
         let confirmCallback = null;
 
-        // FUNGSI UTAMA: Cetak modal HUD game RPG dengan deteksi parameter redirect otomatis
         function openPixelModal(options) {
             document.getElementById('modal-title').innerText = options.title || 'NOTIFIKASI';
             document.getElementById('modal-message').innerText = options.message || '';
@@ -144,7 +143,6 @@
                     <button onclick="closePixelModal(); confirmCallback(false);" class="pixel-modal-btn bg-[#e8734a] border-[#8a3f25] text-black shadow-[4px_4px_0_#000]">BATAL</button>
                 `;
             } else {
-                // FIX CRITICAL REDIRECT: Lempar halaman ke /laporan pas tombol MENGERTI diklik
                 actionContainer.innerHTML = `
                     <button onclick="closePixelModal(); ${options.redirect ? `window.location.href='${options.redirect}';` : ''}" 
                             class="pixel-modal-btn bg-[#d4a94a] border-[#8c6d2d] text-black shadow-[4px_4px_0_#000]">
@@ -174,24 +172,39 @@
 
             document.getElementById('info-room').innerText = "#" + data.roomId;
             document.getElementById('info-stay').innerText = data.stayDays + " Malam";
-            document.getElementById('inv-val-room').innerText = "Rp " + data.roomTotal.toLocaleString();
-            document.getElementById('inv-val-prepaid').innerText = "- Rp " + data.prepaid.toLocaleString();
-            document.getElementById('inv-val-total').innerText = "Rp " + latestGrandTotal.toLocaleString();
+            document.getElementById('inv-val-room').innerText = "Rp " + data.roomTotal.toLocaleString('id-ID');
+            document.getElementById('inv-val-prepaid').innerText = "- Rp " + data.prepaid.toLocaleString('id-ID');
+            document.getElementById('inv-val-total').innerText = "Rp " + latestGrandTotal.toLocaleString('id-ID');
             document.getElementById('payment-amount').value = latestGrandTotal;
 
             let servicesHtml = data.serviceLog.map(s => `<div class="flex justify-between text-lg" style="font-style:italic;"><span>+ ${s}</span></div>`).join('');
             document.getElementById('inv-services').innerHTML = servicesHtml || '<p class="text-sm" style="font-style:italic;">Tanpa layanan tambahan</p>';
         }
 
-        // TRIGGER SAAT KLIK BUTTON UTAMA: Jalankan konfirmasi kustom bertema klan api
         function showCheckoutConfirm() {
             const guestId = selectedGuestId || document.getElementById('checkout-select').value;
+            const paymentAmount = Number(document.getElementById('payment-amount').value || 0);
             const errorEl = document.getElementById('checkout-error');
 
             if(!guestId) {
                 errorEl.innerText = "Pilih tamu terlebih dahulu.";
                 errorEl.classList.remove('hidden');
                 return;
+            }
+
+            // FILTER KETAT FRONTEND: Kunci pergerakan kasir jika input pembayaran kurang uang emasnya!
+            if (paymentAmount < latestGrandTotal) {
+                errorEl.innerText = `⚠ Pembayaran Kurang! Sisa kekurangan: Rp ${(latestGrandTotal - paymentAmount).toLocaleString('id-ID')}`;
+                errorEl.classList.remove('hidden');
+                
+                openPixelModal({
+                    type: 'alert',
+                    title: '⚠ DENDA EMAS KURANG ⚠',
+                    message: `Nominal pembayaran kurang dari total tagihan! Kurang sebesar: Rp ${(latestGrandTotal - paymentAmount).toLocaleString('id-ID')}. Monster dilarang meninggalkan kamar!`,
+                    icon: 'fa-coins',
+                    iconColor: '#a74520'
+                });
+                return; 
             }
 
             confirmCallback = function(isConfirmed) {
@@ -203,13 +216,12 @@
             openPixelModal({
                 type: 'confirm',
                 title: '✦ KONFIRMASI KELUAR ✦',
-                message: 'Proses berkas checkout? Data rekap log monster akan diamankan ke laporan harian dan kamar akan dikosongkan.',
+                message: 'Proses berkas checkout? Seluruh transaksi sisa akan diselesaikan dan status kamar dialihkan menjadi KOSONG.',
                 icon: 'fa-triangle-exclamation',
                 iconColor: '#e8734a'
             });
         }
 
-        // PROSES KIRIM TRANSAKSI DATABASE
         async function executeCheckoutBackend() {
             const guestId = selectedGuestId || document.getElementById('checkout-select').value;
             const paymentAmount = Number(document.getElementById('payment-amount').value || 0);
@@ -230,14 +242,13 @@
             const result = await res.json().catch(() => ({}));
             
             if(res.ok) {
-                // MODAL SUKSES: Kirim parameter redirect menuju rute laporan harian operasional kelompok lu
                 openPixelModal({
                     type: 'alert',
                     title: '✦ CHECKOUT BERHASIL ✦',
                     message: 'Struk transaksi diamankan! Monster telah terbang kembali dengan selamat menuju gerbang dimensi asal.',
                     icon: 'fa-square-check',
                     iconColor: '#85a67a',
-                    redirect: '/laporan' // Otomatis redirect pas mencet tombol MENGERTI!
+                    redirect: '/laporan' // REDIRECT OTOMATIS JALUR SAKTI MENU LAPORAN EXCEL
                 });
             } else {
                 errorEl.innerText = result.message || "Pembayaran kurang atau checkout gagal.";
@@ -246,7 +257,7 @@
                 openPixelModal({
                     type: 'alert',
                     title: '⚠ GAGAL OPERASIONAL ⚠',
-                    message: `Eror inkripsi: ${result.message || 'Nominal pembayaran emas kurang atau data tidak valid.'}`,
+                    message: `${result.message || 'Pembayaran nominal emas kurang atau data kamar tidak valid.'}`,
                     icon: 'fa-circle-xmark',
                     iconColor: '#a74520'
                 });
