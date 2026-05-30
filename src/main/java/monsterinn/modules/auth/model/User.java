@@ -43,8 +43,10 @@ public class User {
         this.role = role;
     }
 
-    // Catatan Enkapsulasi: Kita sengaja TIDAK membuat getPassword() yang public jika tidak diperlukan oleh Spring Security,
-    // untuk memastikan keamanan kredensial seperti yang diminta di proposal.
+    // Diperlukan oleh Spring Security untuk proses autentikasi
+    public String getPassword() {
+        return this.password;
+    }
 
     // --- METHOD UTAMA ---
     /**

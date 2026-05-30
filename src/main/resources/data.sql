@@ -74,3 +74,8 @@ ON DUPLICATE KEY UPDATE id = id;
 INSERT INTO services (id, icon, price, service_name, target_element)
 VALUES (6, 'fa-hand-holding-drop', 40000, 'Root Massage', 'EARTH')
 ON DUPLICATE KEY UPDATE id = id;
+
+-- Hash BCrypt berikut adalah representasi dari text "admin123"
+INSERT INTO users (username, password, role)
+VALUES ('admin', '$2a$10$KjdVekRNLv/pJwOo1P73oO.Z3dQfYSNNoFWutVvp/NJI0vVcVR5Sq', 'ADMIN')
+ON DUPLICATE KEY UPDATE username = username;

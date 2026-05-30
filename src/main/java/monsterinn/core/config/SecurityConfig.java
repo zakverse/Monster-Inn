@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -13,14 +15,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) 
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/**", "/service/**")
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
-            )
-            .csrf(csrf -> csrf
-                // Disable CSRF for JSON API endpoints used by fetch()
-                .ignoringRequestMatchers("/api/**", "/service/**")
             )
             .formLogin(form -> form
                 .loginPage("/login")
@@ -33,5 +33,11 @@ public class SecurityConfig {
                 .permitAll()
             );
         return http.build();
+    }
+
+    // Encoder untuk mengenkripsi password
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
