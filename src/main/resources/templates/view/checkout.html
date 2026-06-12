@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/monster-inn-ui.css}">
+    
+    <meta th:name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
+    <th:block th:replace="~{layout/monster-style :: monster-style}"></th:block>
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <title>Checkout &amp; Tagihan — Monster Inn</title>
+    <style>
+        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; margin: 0; }
+        .text-pixel { font-family: 'Press Start 2P', monospace; font-size: 8px; }
+        .text-retro { font-family: 'VT323', monospace; }
+        .pixel-input { background: #050208; border: 3px solid #3a2e28; color: #f4e8d0; outline: none; transition: border-color 0.15s; }
+        .pixel-input:focus { border-color: #ffd96b; }
+        .invoice-box { 
+            background: #f4e8d0; color: #3a2e28; border: 4px solid #3a2e28; padding: 2rem; 
+            box-shadow: 12px 12px 0 rgba(0,0,0,0.5);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* --- STYLE PIXEL ART CUSTOM MODAL SYSTEM --- */
+        .pixel-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 2, 8, 0.85); display: flex; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s ease-in-out;
+            backdrop-filter: blur(2px);
+        }
+        .pixel-modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .pixel-modal-box {
+            background: #16111d; border: 4px solid #3a2e28; width: 450px;
+            padding: 24px; box-shadow: 0 0 0 4px #16111d, 12px 12px 0 rgba(0,0,0,0.6);
+            transform: scale(0.8); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #f4e8d0;
+        }
+        .pixel-modal-overlay.active .pixel-modal-box { transform: scale(1); }
+        .pixel-modal-btn {
+            font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 12px 16px;
+            cursor: pointer; transition: all 0.1s; border: 4px solid #333;
+        }
+        .pixel-modal-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+    </style>
+</head>
+<body class="mi-app-shell flex min-h-screen">
+    <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
+
+    <main class="flex-1 p-8 overflow-y-auto" style="margin-left: 260px;">
+        <header class="mb-10 pb-6" style="border-bottom: 4px solid #3a2e28;">
+            <div class="text-xs text-pixel mb-2 uppercase" style="color: #c08800;">✦ Proses Pembayaran</div>
+            <h2 class="text-pixel text-xl" style="color: #ffd96b; font-size: 20px;">CHECKOUT &amp; TAGIHAN</h2>
+        </header>
+
+        <div class="grid grid-cols-12 gap-8">
+            <div class="col-span-5 space-y-6">
+                <div class="pixel-card p-6">
+                    <label class="text-pixel block mb-4 uppercase" style="color: #ffd96b;">Siapa yang akan keluar?</label>
+                    <select id="checkout-select" onchange="loadInvoice()" class="pixel-input w-full px-4 py-3 text-retro text-2xl appearance-none cursor-pointer">
+                        <option value="">Pilih tamu...</option>
+                        <option th:each="g : ${activeGuests}" th:value="${g.idMonster}" th:text="${g.name + ' (#' + g.roomId + ')'}"></option>
+                    </select>
+                </div>
+                <div id="room-info" class="pixel-card p-6 hidden">
+                    <div class="text-retro text-2xl" style="margin-bottom: 8px;">Kamar: <span id="info-room" class="font-bold" style="color: #ffd96b;"></span></div>
+                    <div class="text-retro text-2xl">Durasi: <span id="info-stay" style="color: #9c7ac4;"></span></div>
+                </div>
+            </div>
+
+            <div class="col-span-7">
+                <div id="invoice-ui" class="invoice-box hidden">
+                    <h3 class="text-pixel text-center mb-6 pb-4" style="font-size: 10px; border-bottom: 2px dashed #3a2e28; color: #3a2e28;">STRUK TAGIHAN</h3>
+                    
+                    <div class="space-y-4 text-retro text-2xl">
+                        <div class="flex justify-between">
+                            <span id="inv-label-room">Sewa Kamar</span>
+                            <span id="inv-val-room" class="font-bold"></span>
+                        </div>
+                        <div id="inv-services" class="pt-2 space-y-1" style="border-top: 1px solid #3a2e28;"></div>
+                        <div class="pt-4 mt-6" style="border-top: 4px solid #3a2e28;">
+                            <div class="flex justify-between" style="opacity: 0.6;">
+                                <span>Uang Muka:</span>
+                                <span id="inv-val-prepaid"></span>
+                            </div>
+                            <div class="flex justify-between text-3xl font-bold mt-2">
+                                <span>TOTAL:</span>
+                                <span id="inv-val-total"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <label for="payment-amount" class="text-pixel block mb-3 uppercase" style="color: #3a2e28;">Uang Pembayaran</label>
+                        <input id="payment-amount" type="number" min="0" step="1000"
+                            class="pixel-input w-full px-4 py-3 text-retro text-2xl"
+                            style="background: #fffdf4; color: #3a2e28; border-color: #3a2e28;">
+                        <p id="checkout-error" class="hidden text-retro text-2xl font-bold mt-3 animate-pulse" style="color: #a74520;"></p>
+                    </div>
+
+                    <button onclick="showCheckoutConfirm()" class="w-full mt-8 py-4 text-pixel cursor-pointer" 
+                        style="background: #3a2e28; color: #f4e8d0; border: 4px solid #000; transition: all 0.15s; box-shadow: 4px 4px 0 #000;"
+                        onmouseover="this.style.background='#050208'; this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='6px 6px 0 #000';"
+                        onmouseout="this.style.background='#3a2e28'; this.style.transform='none'; this.style.boxShadow='4px 4px 0 #000';">
+                        PROSES CHECKOUT ▶
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="custom-modal" class="pixel-modal-overlay">
+        <div class="pixel-modal-box text-center">
+            <div id="modal-header-icon" class="text-4xl mb-4">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h4 id="modal-title" class="text-pixel mb-4 uppercase" style="color: #ffd96b;">SYSTEM</h4>
+            <p id="modal-message" class="text-retro text-2xl mb-8 px-2"></p>
+            <div id="modal-actions" class="flex justify-center gap-4">
+                </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        let selectedGuestId = null;
+        let latestGrandTotal = 0;
+        let confirmCallback = null;
+
+        function openPixelModal(options) {
+            document.getElementById('modal-title').innerText = options.title || 'NOTIFIKASI';
+            document.getElementById('modal-message').innerText = options.message || '';
+            document.getElementById('modal-header-icon').innerHTML = `<i class="fa-solid ${options.icon || 'fa-circle-info'}"></i>`;
+            document.getElementById('modal-header-icon').style.color = options.iconColor || '#ffd96b';
+            
+            const actionContainer = document.getElementById('modal-actions');
+            actionContainer.innerHTML = '';
+
+            if (options.type === 'confirm') {
+                actionContainer.innerHTML = `
+                    <button onclick="closePixelModal(); confirmCallback(true);" class="pixel-modal-btn bg-[#85a67a] border-[#4c6145] text-black shadow-[4px_4px_0_#000]">YA</button>
+                    <button onclick="closePixelModal(); confirmCallback(false);" class="pixel-modal-btn bg-[#e8734a] border-[#8a3f25] text-black shadow-[4px_4px_0_#000]">BATAL</button>
+                `;
+            } else {
+                actionContainer.innerHTML = `
+                    <button onclick="closePixelModal(); ${options.redirect ? `window.location.href='${options.redirect}';` : ''}" 
+                            class="pixel-modal-btn bg-[#d4a94a] border-[#8c6d2d] text-black shadow-[4px_4px_0_#000]">
+                        MENGERTI
+                    </button>
+                `;
+            }
+            document.getElementById('custom-modal').classList.add('active');
+        }
+
+        function closePixelModal() {
+            document.getElementById('custom-modal').classList.remove('active');
+        }
+
+        async function loadInvoice() {
+            const guestId = document.getElementById('checkout-select').value;
+            if(!guestId) return;
+            selectedGuestId = guestId;
+
+            const res = await fetch(`/api/checkout-info/${guestId}`);
+            const data = await res.json();
+            latestGrandTotal = Number(data.grandTotal || 0);
+
+            document.getElementById('invoice-ui').classList.remove('hidden');
+            document.getElementById('room-info').classList.remove('hidden');
+            document.getElementById('checkout-error').classList.add('hidden');
+
+            document.getElementById('info-room').innerText = "#" + data.roomId;
+            document.getElementById('info-stay').innerText = data.stayDays + " Malam";
+            document.getElementById('inv-val-room').innerText = "Rp " + data.roomTotal.toLocaleString('id-ID');
+            document.getElementById('inv-val-prepaid').innerText = "- Rp " + data.prepaid.toLocaleString('id-ID');
+            document.getElementById('inv-val-total').innerText = "Rp " + latestGrandTotal.toLocaleString('id-ID');
+            document.getElementById('payment-amount').value = latestGrandTotal;
+
+            let servicesHtml = data.serviceLog.map(s => `<div class="flex justify-between text-lg" style="font-style:italic;"><span>+ ${s}</span></div>`).join('');
+            document.getElementById('inv-services').innerHTML = servicesHtml || '<p class="text-sm" style="font-style:italic;">Tanpa layanan tambahan</p>';
+        }
+
+        function showCheckoutConfirm() {
+            const guestId = selectedGuestId || document.getElementById('checkout-select').value;
+            const paymentAmount = Number(document.getElementById('payment-amount').value || 0);
+            const errorEl = document.getElementById('checkout-error');
+
+            if(!guestId) {
+                errorEl.innerText = "Pilih tamu terlebih dahulu.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            // FILTER KETAT FRONTEND: Kunci pergerakan kasir jika input pembayaran kurang uang emasnya!
+            if (paymentAmount < latestGrandTotal) {
+                errorEl.innerText = `⚠ Pembayaran Kurang! Sisa kekurangan: Rp ${(latestGrandTotal - paymentAmount).toLocaleString('id-ID')}`;
+                errorEl.classList.remove('hidden');
+                
+                openPixelModal({
+                    type: 'alert',
+                    title: '⚠ DENDA EMAS KURANG ⚠',
+                    message: `Nominal pembayaran kurang dari total tagihan! Kurang sebesar: Rp ${(latestGrandTotal - paymentAmount).toLocaleString('id-ID')}. Monster dilarang meninggalkan kamar!`,
+                    icon: 'fa-coins',
+                    iconColor: '#a74520'
+                });
+                return; 
+            }
+
+            confirmCallback = function(isConfirmed) {
+                if (isConfirmed) {
+                    executeCheckoutBackend();
+                }
+            };
+
+            openPixelModal({
+                type: 'confirm',
+                title: '✦ KONFIRMASI KELUAR ✦',
+                message: 'Proses berkas checkout? Seluruh transaksi sisa akan diselesaikan dan status kamar dialihkan menjadi KOSONG.',
+                icon: 'fa-triangle-exclamation',
+                iconColor: '#e8734a'
+            });
+        }
+
+        async function executeCheckoutBackend() {
+            const guestId = selectedGuestId || document.getElementById('checkout-select').value;
+            const paymentAmount = Number(document.getElementById('payment-amount').value || 0);
+            const errorEl = document.getElementById('checkout-error');
+
+            const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+            const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+            const res = await fetch(`/api/checkout/confirm/${guestId}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    [header]: token
+                },
+                body: JSON.stringify({ paymentAmount })
+            });
+            
+            const result = await res.json().catch(() => ({}));
+            
+            if(res.ok) {
+                openPixelModal({
+                    type: 'alert',
+                    title: '✦ CHECKOUT BERHASIL ✦',
+                    message: 'Struk transaksi diamankan! Monster telah terbang kembali dengan selamat menuju gerbang dimensi asal.',
+                    icon: 'fa-square-check',
+                    iconColor: '#85a67a',
+                    redirect: '/laporan' // REDIRECT OTOMATIS JALUR SAKTI MENU LAPORAN EXCEL
+                });
+            } else {
+                errorEl.innerText = result.message || "Pembayaran kurang atau checkout gagal.";
+                errorEl.classList.remove('hidden');
+                
+                openPixelModal({
+                    type: 'alert',
+                    title: '⚠ GAGAL OPERASIONAL ⚠',
+                    message: `${result.message || 'Pembayaran nominal emas kurang atau data kamar tidak valid.'}`,
+                    icon: 'fa-circle-xmark',
+                    iconColor: '#a74520'
+                });
+            }
+        }
+    </script>
+    <script defer th:src="@{/js/monster-inn-ui.js}"></script>
+</body>
+</html>

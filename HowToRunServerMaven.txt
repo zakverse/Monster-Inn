@@ -1,0 +1,6 @@
+Just Type in Terminal
+
+```
+mvn spring-boot:run
+
+```

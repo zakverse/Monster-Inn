@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <title>Login Resepsionis - Monster Inn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-night: #0f0b14;
+            --bg-deep: #1e1825;
+            --bg-darker: #050208;
+            --parchment: #f4e8d0;
+            --wood-dark: #3a2e28;
+            --wood-light: #8a6d4f;
+            --gold: #d4a94a;
+            --gold-bright: #ffd96b;
+            --fire: #e8734a;
+            --fire-glow: #ffb570;
+            --magic: #9c7ac4;
+            --magic-glow: #c9a8f0;
+            --earth: #85a67a;
+        }
+        body {
+            font-family: 'Pixelify Sans', system-ui, sans-serif;
+            background: radial-gradient(ellipse at 30% 30%, rgba(156,122,196,0.15) 0%, transparent 50%),
+                        linear-gradient(180deg, #1e1825 0%, #0a0608 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            image-rendering: pixelated;
+        }
+        .stars {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+        }
+        .stars::before {
+            content: '';
+            position: absolute; inset: -10%;
+            background-image:
+                radial-gradient(1px 1px at 8% 14%, #fff, transparent),
+                radial-gradient(2px 2px at 41% 28%, #ffd96b, transparent),
+                radial-gradient(1px 1px at 58% 79%, #fff, transparent),
+                radial-gradient(2px 2px at 88% 56%, #c9a8f0, transparent),
+                radial-gradient(1px 1px at 22% 67%, #fff, transparent),
+                radial-gradient(1px 1px at 74% 12%, #fff, transparent);
+            opacity: 0.8;
+            animation: twinkle 4s infinite ease-in-out;
+        }
+        @keyframes twinkle { 0%,100% { opacity:0.3; } 50% { opacity:1; } }
+        @keyframes arrowBounce { 0%,100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+        @keyframes portalSpin { to { transform: rotate(360deg); } }
+        @keyframes portalPulse { 0%,100% { transform: scale(1); opacity:0.86; } 50% { transform: scale(1.04); opacity:1; } }
+        @keyframes flame { 0%,100% { opacity:.75; transform: scaleY(.94); } 50% { opacity:1; transform: scaleY(1.08); } }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+        }
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .art-section { display: none; }
+        }
+
+        /* ===== INN ART ===== */
+        .art-section {
+            position: relative;
+            min-height: 440px;
+            display: grid;
+            place-items: end center;
+        }
+        .mi-portal {
+            position: absolute;
+            top: 0; left: 50%;
+            width: 300px; height: 300px;
+            transform: translateX(-50%);
+            border: 5px solid var(--magic);
+            border-radius: 50%;
+            background:
+                conic-gradient(from 0deg, rgba(156,122,196,0.1), rgba(255,217,107,0.48), rgba(107,163,197,0.4), rgba(156,122,196,0.1)),
+                radial-gradient(circle, rgba(255,217,107,0.18) 0 18%, rgba(156,122,196,0.48) 19% 44%, transparent 45%);
+            box-shadow: 0 0 54px rgba(156,122,196,0.42), inset 0 0 36px rgba(255,217,107,0.2);
+            animation: portalSpin 16s linear infinite, portalPulse 3.4s ease-in-out infinite;
+        }
+        .mi-inn {
+            position: relative;
+            width: 360px; height: 260px;
+            z-index: 2;
+            filter: drop-shadow(14px 14px 0 rgba(0,0,0,0.5));
+        }
+        .mi-inn-roof {
+            position: absolute;
+            left: 20px; right: 20px; top: 18px; height: 76px;
+            background: var(--wood-dark);
+            border: 5px solid #1b120f;
+            clip-path: polygon(0 100%,17% 20%,36% 20%,50% 0,64% 20%,83% 20%,100% 100%);
+        }
+        .mi-inn-body {
+            position: absolute;
+            left: 54px; right: 54px; bottom: 0; height: 190px;
+            border: 5px solid #1b120f;
+            background: repeating-linear-gradient(90deg, #4a382d 0 24px, #3a2e28 24px 48px);
+        }
+        .mi-window {
+            position: absolute;
+            width: 34px; height: 38px;
+            border: 4px solid #1b120f;
+            background: var(--gold-bright);
+            box-shadow: 0 0 18px rgba(255,217,107,0.6);
+            animation: flame 2.2s ease-in-out infinite;
+        }
+        .mi-window.one { left: 86px; top: 118px; }
+        .mi-window.two { right: 86px; top: 118px; animation-delay: .8s; }
+        .mi-door {
+            position: absolute;
+            left: 50%; bottom: 0;
+            width: 72px; height: 98px;
+            transform: translateX(-50%);
+            border: 5px solid #1b120f;
+            background: linear-gradient(90deg, #21170f 0 48%, #120b08 48% 52%, #21170f 52%);
+        }
+        .mi-torch {
+            position: absolute; bottom: 80px;
+            width: 18px; height: 54px;
+            background: #21170f;
+            border: 3px solid #050208;
+        }
+        .mi-torch::before {
+            content: "";
+            position: absolute; left: -7px; top: -22px;
+            width: 26px; height: 28px;
+            background: var(--fire);
+            box-shadow: 0 0 18px rgba(232,115,74,0.8);
+            clip-path: polygon(50% 0,78% 30%,100% 68%,50% 100%,0 68%,22% 30%);
+            animation: flame .55s steps(2,end) infinite;
+        }
+        .mi-torch.left { left: 40px; }
+        .mi-torch.right { right: 40px; }
+
+        /* ===== LOGIN CARD ===== */
+        .login-card {
+            background: rgba(30,24,37,0.96);
+            border: 5px solid var(--wood-dark);
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
+            padding: 44px 40px;
+        }
+        .logo-box {
+            width: 64px; height: 64px;
+            background: var(--bg-darker);
+            border: 4px solid var(--gold-bright);
+            box-shadow: 6px 6px 0 #000;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .logo-box span {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 20px;
+            color: var(--gold-bright);
+        }
+        .kicker {
+            display: inline-flex; align-items: center;
+            padding: 8px 16px;
+            background: rgba(156,122,196,0.15);
+            border: 2px solid var(--magic);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 9px; letter-spacing: 2px;
+            color: var(--magic-glow);
+            text-shadow: 1px 1px 0 #000;
+            margin-bottom: 16px;
+        }
+        .login-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 16px;
+            color: var(--gold-bright);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .login-sub {
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            color: var(--magic);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        label {
+            display: block;
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            color: var(--gold-bright);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .pixel-input {
+            width: 100%;
+            background: var(--bg-darker);
+            border: 3px solid var(--wood-dark);
+            color: var(--parchment);
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            padding: 12px 16px;
+            outline: none;
+            margin-bottom: 20px;
+        }
+        .pixel-input:focus {
+            border-color: var(--gold-bright);
+            box-shadow: 4px 4px 0 rgba(212,169,74,0.25);
+        }
+        .mi-btn {
+            width: 100%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 24px;
+            background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+            color: var(--wood-dark);
+            border: 5px solid var(--wood-dark);
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .mi-btn:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 rgba(0,0,0,0.5); }
+        .mi-btn:active { transform: translate(2px,2px); box-shadow: 3px 3px 0 rgba(0,0,0,0.5); }
+        .mi-arrow { display: inline-block; animation: arrowBounce 1s infinite; }
+
+        .alert-error {
+            border: 4px solid var(--fire);
+            background: rgba(232,115,74,0.15);
+            padding: 14px 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .alert-error p {
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            color: #ffb99f;
+        }
+        .alert-success {
+            border: 4px solid var(--earth);
+            background: rgba(133,166,122,0.15);
+            padding: 14px 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .alert-success p {
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            color: #b5d4a8;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 4px solid var(--wood-dark);
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            color: var(--magic);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        .back-link:hover { color: var(--gold-bright); }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+
+    <div class="container">
+        <!-- Inn Art -->
+        <section class="art-section">
+            <div class="mi-portal"></div>
+            <div class="mi-inn">
+                <div class="mi-inn-roof"></div>
+                <div class="mi-inn-body"></div>
+                <div class="mi-window one"></div>
+                <div class="mi-window two"></div>
+                <div class="mi-door"></div>
+                <div class="mi-torch left"></div>
+                <div class="mi-torch right"></div>
+            </div>
+        </section>
+
+        <!-- Login Card -->
+        <section class="login-card">
+            <div style="text-align:center; margin-bottom: 28px;">
+                <div class="logo-box"><span>M</span></div>
+                <div class="kicker">PORTAL RECEPTIONIST</div>
+                <h1 class="login-title">MONSTER INN</h1>
+                <p class="login-sub">Masukkan kunci staf untuk membuka front desk.</p>
+            </div>
+
+            <!-- Error -->
+            <div th:if="${error != null}" class="alert-error">
+                <p th:text="${error}">Akses ditolak.</p>
+            </div>
+
+            <!-- Logout Success -->
+            <div th:if="${logoutMsg != null}" class="alert-success">
+                <p th:text="${logoutMsg}">Logout berhasil.</p>
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div>
+                    <label for="username">ID Staf</label>
+                    <input type="text" id="username" name="username" class="pixel-input"
+                           placeholder="admin" required>
+                </div>
+                <div>
+                    <label for="password">Kunci Akses</label>
+                    <input type="password" id="password" name="password" class="pixel-input"
+                           placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="mi-btn">
+                    Enter Night Shift <span class="mi-arrow">▶</span>
+                </button>
+            </form>
+
+            <a href="/" class="back-link">‹ Kembali ke lobi utama</a>
+        </section>
+    </div>
+</body>
+</html>

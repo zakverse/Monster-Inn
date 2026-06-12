@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/monster-inn-ui.css}">
+    <th:block th:replace="~{layout/monster-style :: monster-style}"></th:block>
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <title>Status Habitat — Monster Inn</title>
+    <style>
+        body { background: #0f0b14; color: #f4e8d0; font-family: 'Pixelify Sans', sans-serif; image-rendering: pixelated; margin: 0; }
+        .text-pixel { font-family: 'Press Start 2P', monospace; }
+        .text-retro { font-family: 'VT323', monospace; }
+        
+        .room-box { min-width: 220px; border: 4px solid #3a2e28; position: relative; transition: all 0.2s; background: rgba(30,24,37,0.94); }
+        .room-box:hover { transform: translateY(-5px); border-color: #ffd96b; box-shadow: 8px 8px 0 rgba(0,0,0,0.5); }
+        
+        /* Status Tags */
+        .status-tag { position: absolute; top: 0; right: 0; padding: 2px 8px; font-size: 10px; font-family: 'Press Start 2P', monospace; border-left: 4px solid #3a2e28; border-bottom: 4px solid #3a2e28; }
+        .bg-available { background: #85a67a; color: #000; }
+        .bg-occupied { background: #e8734a; color: #fff; }
+        .bg-dirty { background: #666; color: #ccc; }
+        .bg-maintenance { background: #9c7ac4; color: #fff; }
+
+        /* Scrollbar Pixel Style */
+        .pixel-scroll::-webkit-scrollbar { height: 8px; }
+        .pixel-scroll::-webkit-scrollbar-track { background: #1e1825; }
+        .pixel-scroll::-webkit-scrollbar-thumb { background: #3a2e28; border: 1px solid #ffd96b; }
+
+        /* Flash messages */
+        .flash-success { border: 4px solid #85a67a; background: rgba(133,166,122,0.15); padding: 14px 16px; text-align: center; margin-bottom: 16px; }
+        .flash-success p { font-family: 'VT323', monospace; font-size: 22px; color: #b5d4a8; }
+    </style>
+</head>
+<body class="mi-app-shell flex min-h-screen">
+
+    <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
+
+    <main class="flex-1 p-8 overflow-x-hidden" style="margin-left: 260px;">
+        <!-- Flash Messages -->
+        <div th:if="${successMsg != null}" class="flash-success">
+            <p th:text="${successMsg}">Success</p>
+        </div>
+
+        <header class="mb-10 pb-6 flex justify-between items-center" style="border-bottom: 4px solid #3a2e28;">
+            <div>
+                <div class="text-xs text-pixel mb-2 uppercase" style="color: #c08800;">✦ Monitoring Real-time</div>
+                <h2 class="text-pixel text-xl" style="color: #ffd96b;">STATUS HABITAT</h2>
+            </div>
+            
+            <div class="flex gap-4 text-retro text-xl">
+                <span class="flex items-center gap-2"><div style="width: 12px; height: 12px; background: #85a67a;"></div> READY</span>
+                <span class="flex items-center gap-2"><div style="width: 12px; height: 12px; background: #e8734a;"></div> OCCUPIED</span>
+                <span class="flex items-center gap-2"><div style="width: 12px; height: 12px; background: #666;"></div> DIRTY</span>
+            </div>
+        </header>
+
+        <!-- FIRE ZONE -->
+        <section class="mb-12">
+            <h3 class="text-pixel mb-6 flex items-center gap-2" style="font-size: 10px; color: #e8734a;">
+                <i class="fa-solid fa-fire"></i> FIRE ZONE
+            </h3>
+            <div class="flex gap-6 overflow-x-auto pb-4 pixel-scroll">
+                <div th:each="room : ${fireRooms}" class="room-box p-5" 
+                     th:style="${room.status.name() == 'OCCUPIED' ? 'background: #2a1a1a;' : (room.status.name() == 'DIRTY' ? 'opacity: 0.5;' : '')}">
+                    
+                    <div class="status-tag font-bold" th:text="${room.status.label}"
+                         th:classappend="${'bg-' + room.status.name().toLowerCase()}"></div>
+                    
+                    <div class="text-pixel mb-4" style="font-size: 8px; color: #888;" th:text="'#' + ${room.roomId}"></div>
+                    
+                    <div class="flex justify-center mb-6">
+                        <i th:if="${room.status.name() == 'OCCUPIED'}" class="fa-solid fa-dragon text-5xl" style="color: #ffd96b;"></i>
+                        <i th:if="${room.status.name() == 'AVAILABLE'}" class="fa-solid fa-fire text-5xl" style="color: #3a2e28;"></i>
+                        <i th:if="${room.status.name() == 'DIRTY'}" class="fa-solid fa-broom text-5xl" style="color: #888;"></i>
+                    </div>
+
+                    <div class="text-center pt-3" style="border-top: 2px solid #3a2e28;">
+                        <p class="text-retro text-2xl font-bold uppercase" th:text="${room.currentGuest != null ? room.currentGuest.name : 'VACANT'}"></p>
+                        
+                        <form th:if="${room.status.name() == 'DIRTY'}" th:action="@{/room/clean/{id}(id=${room.roomId})}" method="post">
+                            <button type="submit" class="mt-2 px-2 py-1" style="font-size: 10px; font-family: 'Press Start 2P', monospace; background: #85a67a; color: #000; border: 2px solid #000; cursor: pointer; transition: all 0.15s;"
+                                onmouseover="this.style.background='#b5d4a8'"
+                                onmouseout="this.style.background='#85a67a'">CLEAN</button>
+                        </form>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(fireRooms)}" class="room-box p-10 text-center" style="min-width: 100%; opacity: 0.4; border-style: dashed;">
+                    <p class="text-pixel" style="font-size: 8px;">Belum ada kamar Fire...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WATER ZONE -->
+        <section class="mb-12">
+            <h3 class="text-pixel mb-6 flex items-center gap-2" style="font-size: 10px; color: #6ba3c5;">
+                <i class="fa-solid fa-droplet"></i> WATER ZONE
+            </h3>
+            <div class="flex gap-6 overflow-x-auto pb-4 pixel-scroll">
+                <div th:each="room : ${waterRooms}" class="room-box p-5"
+                     th:style="${room.status.name() == 'OCCUPIED' ? 'background: #1a232a;' : (room.status.name() == 'DIRTY' ? 'opacity: 0.5;' : '')}">
+                    
+                    <div class="status-tag font-bold" th:text="${room.status.label}"
+                         th:classappend="${'bg-' + room.status.name().toLowerCase()}"></div>
+                    
+                    <div class="text-pixel mb-4" style="font-size: 8px; color: #888;" th:text="'#' + ${room.roomId}"></div>
+                    
+                    <div class="flex justify-center mb-6">
+                        <i th:if="${room.status.name() == 'OCCUPIED'}" class="fa-solid fa-dragon text-5xl" style="color: #9cd4ee;"></i>
+                        <i th:if="${room.status.name() == 'AVAILABLE'}" class="fa-solid fa-water text-5xl" style="color: #3a2e28;"></i>
+                        <i th:if="${room.status.name() == 'DIRTY'}" class="fa-solid fa-broom text-5xl" style="color: #888;"></i>
+                    </div>
+
+                    <div class="text-center pt-3" style="border-top: 2px solid #3a2e28;">
+                        <p class="text-retro text-2xl font-bold uppercase" th:text="${room.currentGuest != null ? room.currentGuest.name : 'VACANT'}"></p>
+                        <form th:if="${room.status.name() == 'DIRTY'}" th:action="@{/room/clean/{id}(id=${room.roomId})}" method="post">
+                            <button type="submit" class="mt-2 px-2 py-1" style="font-size: 10px; font-family: 'Press Start 2P', monospace; background: #85a67a; color: #000; border: 2px solid #000; cursor: pointer; transition: all 0.15s;"
+                                onmouseover="this.style.background='#b5d4a8'"
+                                onmouseout="this.style.background='#85a67a'">CLEAN</button>
+                        </form>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(waterRooms)}" class="room-box p-10 text-center" style="min-width: 100%; opacity: 0.4; border-style: dashed;">
+                    <p class="text-pixel" style="font-size: 8px;">Belum ada kamar Water...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- EARTH ZONE -->
+        <section class="mb-12">
+            <h3 class="text-pixel mb-6 flex items-center gap-2" style="font-size: 10px; color: #85a67a;">
+                <i class="fa-solid fa-mountain"></i> EARTH ZONE
+            </h3>
+            <div class="flex gap-6 overflow-x-auto pb-4 pixel-scroll">
+                <div th:each="room : ${earthRooms}" class="room-box p-5"
+                     th:style="${room.status.name() == 'OCCUPIED' ? 'background: #1e2a1a;' : (room.status.name() == 'DIRTY' ? 'opacity: 0.5;' : '')}">
+                    
+                    <div class="status-tag font-bold" th:text="${room.status.label}"
+                         th:classappend="${'bg-' + room.status.name().toLowerCase()}"></div>
+                    
+                    <div class="text-pixel mb-4" style="font-size: 8px; color: #888;" th:text="'#' + ${room.roomId}"></div>
+                    
+                    <div class="flex justify-center mb-6">
+                        <i th:if="${room.status.name() == 'OCCUPIED'}" class="fa-solid fa-dragon text-5xl" style="color: #b5d4a8;"></i>
+                        <i th:if="${room.status.name() == 'AVAILABLE'}" class="fa-solid fa-tree text-5xl" style="color: #3a2e28;"></i>
+                        <i th:if="${room.status.name() == 'DIRTY'}" class="fa-solid fa-broom text-5xl" style="color: #888;"></i>
+                    </div>
+
+                    <div class="text-center pt-3" style="border-top: 2px solid #3a2e28;">
+                        <p class="text-retro text-2xl font-bold uppercase" th:text="${room.currentGuest != null ? room.currentGuest.name : 'VACANT'}"></p>
+                        <form th:if="${room.status.name() == 'DIRTY'}" th:action="@{/room/clean/{id}(id=${room.roomId})}" method="post">
+                            <button type="submit" class="mt-2 px-2 py-1" style="font-size: 10px; font-family: 'Press Start 2P', monospace; background: #85a67a; color: #000; border: 2px solid #000; cursor: pointer; transition: all 0.15s;"
+                                onmouseover="this.style.background='#b5d4a8'"
+                                onmouseout="this.style.background='#85a67a'">CLEAN</button>
+                        </form>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(earthRooms)}" class="room-box p-10 text-center" style="min-width: 100%; opacity: 0.4; border-style: dashed;">
+                    <p class="text-pixel" style="font-size: 8px;">Belum ada kamar Earth...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script defer th:src="@{/js/monster-inn-ui.js}"></script>
+</body>
+</html>

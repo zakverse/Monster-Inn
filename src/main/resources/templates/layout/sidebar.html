@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="monster-sidebar" class="mi-sidebar flex flex-col" style="
+    width: 260px;
+    min-height: 100vh;
+    background: #0a0408;
+    border-right: 4px solid #3a2e28;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    font-family: 'Press Start 2P', monospace;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 50;
+">
+    <!-- Logo & Header Terminal -->
+    <div style="padding: 24px 20px; border-bottom: 4px solid #3a2e28; background: #050208; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+        <img th:src="@{/images/logo.png}" alt="Logo" style="width: 110px; height: 110px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(4px 4px 0 #000);" />
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 12px; color: #ffd96b; text-shadow: 2px 2px 0 #000; letter-spacing: 1px;">
+            MONSTER INN
+        </div>
+        <div style="font-family: 'VT323', monospace; font-size: 18px; color: #9c7ac4; margin-top: -4px;">
+            Front Desk Terminal
+        </div>
+    </div>
+
+    <!-- Nav Links (Diperbesar & Diperluas Jaraknya) -->
+    <div style="flex: 1; padding: 24px 16px; display: flex; flex-direction: column; gap: 12px;">
+
+        <!-- OVERVIEW / DASHBOARD -->
+        <a th:href="@{/dashboard}" style="
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
+            color: #f4e8d0;
+            text-decoration: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            稳定-spacing: 1px;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+        "
+        onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
+        onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
+            <i class="fa-solid fa-gauge-high" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> OVERVIEW
+        </a>
+
+        <!-- STATUS KAMAR -->
+        <a th:href="@{/room/status}" style="
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
+            color: #f4e8d0;
+            text-decoration: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+        "
+        onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
+        onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
+            <i class="fa-solid fa-bed" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> STATUS KAMAR
+        </a>
+
+        <!-- REGISTRASI TAMU -->
+        <a th:href="@{/registrasi}" style="
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
+            color: #f4e8d0;
+            text-decoration: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+        "
+        onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
+        onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
+            <i class="fa-solid fa-user-plus" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> REGISTRASI
+        </a>
+
+        <!-- LAYANAN TAMBAHAN -->
+        <a th:href="@{/layanan}" style="
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
+            color: #f4e8d0;
+            text-decoration: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+        "
+        onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
+        onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
+            <i class="fa-solid fa-wand-magic-sparkles" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> LAYANAN
+        </a>
+
+        <!-- CHECKOUT & BILLING -->
+        <a th:href="@{/checkout}" style="
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
+            color: #f4e8d0;
+            text-decoration: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+        "
+        onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
+        onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
+            <i class="fa-solid fa-money-bill-wave" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> CHECKOUT
+        </a>
+
+        <!-- LAPORAN HARIAN -->
+        <a th:href="@{/laporan}" style="
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 16px;
+            color: #f4e8d0;
+            text-decoration: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+        "
+        onmouseover="this.style.background='#1e1825'; this.style.borderColor='#3a2e28'; this.style.color='#ffd96b';"
+        onmouseout="this.style.background='transparent'; this.style.borderColor='transparent'; this.style.color='#f4e8d0';">
+            <i class="fa-solid fa-chart-line" style="width: 20px; text-align: center; font-size: 1.2rem;"></i> LAPORAN
+        </a>
+    </div>
+
+    <!-- SHIFT NIGHT LOGOUT -->
+    <div style="padding: 20px 16px; border-top: 4px solid #3a2e28;">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" style="
+                width: 100%;
+                display: flex; align-items: center; justify-content: center; gap: 14px;
+                padding: 14px 16px;
+                background: transparent;
+                color: #e8734a;
+                font-family: 'Press Start 2P', monospace;
+                font-size: 10px;
+                letter-spacing: 1px;
+                border: 2px solid #e8734a;
+                cursor: pointer;
+                transition: all 0.15s;
+            "
+            onmouseover="this.style.background='#e8734a'; this.style.color='#000';"
+            onmouseout="this.style.background='transparent'; this.style.color='#e8734a';">
+                <i class="fa-solid fa-door-open" style="font-size: 1.2rem;"></i> LOGOUT
+            </button>
+        </form>
+    </div>
+</nav>
+</body>
+</html>
