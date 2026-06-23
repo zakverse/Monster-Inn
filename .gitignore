@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+app-runtime.log
+mysql-runtime.log
+.codex-run-hidden.vbs
+.codex-run-mysql.cmd
+.codex-run-server.cmd

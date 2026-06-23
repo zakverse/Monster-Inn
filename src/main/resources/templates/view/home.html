@@ -884,6 +884,31 @@ body {
   border: 3px solid var(--gold);
   box-shadow: var(--shadow-soft);
 }
+.feature-icon.manual-input-icon {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 7px;
+  font-size: 8px;
+}
+.manual-input-icon .manual-field {
+  height: 8px;
+  background: var(--parchment);
+  border: 2px solid var(--gold);
+}
+.manual-input-icon .manual-field.short {
+  width: 72%;
+}
+.manual-input-icon .manual-submit {
+  align-self: flex-end;
+  padding: 2px 4px;
+  background: var(--gold-bright);
+  color: var(--wood-dark);
+  border: 2px solid var(--gold-dark);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  line-height: 1;
+}
 .feature-card h3 {
   font-family: 'Press Start 2P', monospace;
   font-size: 12px;
@@ -1581,10 +1606,14 @@ body {
 
     <div class="features-grid">
       <div class="feature-card reveal">
-        <div class="feature-icon">🚪</div>
+        <div class="feature-icon manual-input-icon" aria-hidden="true">
+          <span class="manual-field"></span>
+          <span class="manual-field short"></span>
+          <span class="manual-submit">ISI</span>
+        </div>
         <div>
-          <h3>Drag-and-Drop<br>Check-In</h3>
-          <p>Seret kartu tamu ke kamar yang sesuai elemen. Salah elemen? Sistem akan menolak dengan gemerlap merah dan toast error. <code>Room.checkIn(guest)</code> punya validasi tipe yang ketat.</p>
+          <h3>Input Data<br>Manual</h3>
+          <p>Masukkan data monster secara manual melalui form yang tersedia. Isi nama monster, elemen, durasi menginap, dan kebutuhan layanan secara bertahap dan mudah dipahami.</p>
         </div>
       </div>
 
