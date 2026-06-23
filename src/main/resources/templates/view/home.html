@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<!-- <link rel="icon" type="image/png" th:href="@{/images/logo.png}"> -->
+<link rel="icon" type="image/png" sizes="64x64" th:href="@{/images/favicon.png}">
 
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 <style>
@@ -94,6 +94,14 @@ body {
   gap: 8px;
 }
 .nav-logo span { color: var(--magic-glow); }
+.nav-logo-image {
+  width: 78px;
+  height: 62px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(3px 3px 0 #000);
+}
 .nav-logo .torch-icon {
   display: inline-block;
   width: 12px; height: 18px;
@@ -134,9 +142,44 @@ body {
 .nav-cta:hover { background: var(--gold-bright) !important; color: var(--wood-dark) !important; }
 .nav-cta:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.3); }
 
+.audio-toggles {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+.audio-toggle {
+  padding: 9px 11px;
+  border: 3px solid var(--wood-dark);
+  background: var(--gold);
+  color: var(--wood-dark);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.45);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+.audio-toggle:hover { background: var(--gold-bright); }
+.audio-toggle:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 rgba(0,0,0,0.45); }
+.audio-toggle[aria-pressed="false"] {
+  background: var(--wood-dark);
+  color: var(--parchment-dark);
+  border-color: var(--gold-dark);
+}
+
+[data-sfx] { cursor: pointer; }
+
 @media (max-width: 720px) {
   .nav-links a:not(.nav-cta) { display: none; }
   .navbar { padding: 12px 20px; }
+  .nav-logo { font-size: 10px; letter-spacing: 1px; gap: 4px; }
+  .nav-logo-image { width: 60px; height: 50px; }
+  .audio-toggles { right: 12px; bottom: 12px; }
 }
 
 /* ============ STARS BG ============ */
@@ -1272,20 +1315,33 @@ body {
 </head>
 <body>
 
+<audio id="landing-bgm" loop preload="auto">
+  <source th:src="@{/images/audio/Sunrise_at_the_Gate.mp3}" type="audio/mpeg">
+</audio>
+
 <!-- ============ NAVBAR ============ -->
 <nav class="navbar" id="navbar">
-  <div class="nav-logo" style="display: flex; align-items: center; gap: 8px;">
-    <img th:src="@{/images/logo.png}" alt="Logo" style="width: 42px; height: 42px; object-fit: contain; image-rendering: pixelated;" />
+  <div class="nav-logo">
+    <img class="nav-logo-image" th:src="@{/images/logo-cropped.png}" alt="Logo Monster Inn" />
     MONSTER <span>INN</span>
   </div>
   <div class="nav-links">
-    <a href="#invitation">Cerita</a>
-    <a href="#guests">Tamu</a>
-    <a href="#features">Fitur</a>
-    <a href="#pillars">OOP</a>
-    <a href="/login" class="nav-cta" id="nav-cta">▶ Mulai</a>
+    <a href="#invitation" data-sfx="click">Cerita</a>
+    <a href="#guests" data-sfx="click">Tamu</a>
+    <a href="#features" data-sfx="click">Fitur</a>
+    <a href="#pillars" data-sfx="click">OOP</a>
+    <a href="/login" class="nav-cta" id="nav-cta" data-sfx="success">▶ Mulai</a>
   </div>
 </nav>
+
+<div class="audio-toggles" aria-label="Kontrol audio landing page">
+  <button class="audio-toggle" id="music-toggle" type="button" aria-pressed="false" aria-label="Aktifkan musik latar">
+    MUSIC: OFF
+  </button>
+  <button class="audio-toggle" id="sfx-toggle" type="button" aria-pressed="true" aria-label="Matikan efek suara">
+    SFX: ON
+  </button>
+</div>
 
 <!-- ============ HERO SECTION ============ -->
 <header class="hero">
@@ -1313,11 +1369,11 @@ body {
     </p>
 
     <div class="hero-cta-group">
-      <a href="/login" class="btn-mega" id="hero-cta">
+      <a href="/login" class="btn-mega" id="hero-cta" data-sfx="magic">
         <span>MASUK PENGINAPAN</span>
         <span class="arrow">▶</span>
       </a>
-      <a href="#invitation" class="btn-secondary">
+      <a href="#invitation" class="btn-secondary" data-sfx="click">
         <span>📜 BACA CERITA</span>
       </a>
     </div>
@@ -1457,7 +1513,7 @@ body {
 
     <div class="guest-grid">
       <!-- FIRE -->
-      <div class="guest-tile fire reveal">
+      <div class="guest-tile fire reveal" data-sfx="error">
         <div class="corner-tag">FIRE</div>
         <div class="guest-sprite-frame">
           <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -1503,7 +1559,7 @@ body {
       </div>
 
       <!-- WATER -->
-      <div class="guest-tile water reveal">
+      <div class="guest-tile water reveal" data-sfx="magic">
         <div class="corner-tag">WATER</div>
         <div class="guest-sprite-frame">
           <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -1548,7 +1604,7 @@ body {
       </div>
 
       <!-- EARTH -->
-      <div class="guest-tile earth reveal">
+      <div class="guest-tile earth reveal" data-sfx="click">
         <div class="corner-tag">EARTH</div>
         <div class="guest-sprite-frame">
           <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -1605,7 +1661,7 @@ body {
     </div>
 
     <div class="features-grid">
-      <div class="feature-card reveal">
+      <div class="feature-card reveal" data-sfx="click">
         <div class="feature-icon manual-input-icon" aria-hidden="true">
           <span class="manual-field"></span>
           <span class="manual-field short"></span>
@@ -1617,7 +1673,7 @@ body {
         </div>
       </div>
 
-      <div class="feature-card reveal">
+      <div class="feature-card reveal" data-sfx="magic">
         <div class="feature-icon">✨</div>
         <div>
           <h3>One Button,<br>Three Behaviors</h3>
@@ -1625,7 +1681,7 @@ body {
         </div>
       </div>
 
-      <div class="feature-card reveal">
+      <div class="feature-card reveal" data-sfx="coin">
         <div class="feature-icon">🔒</div>
         <div>
           <h3>Tagihan yang<br>Tidak Bisa Dicurangi</h3>
@@ -1633,7 +1689,7 @@ body {
         </div>
       </div>
 
-      <div class="feature-card reveal">
+      <div class="feature-card reveal" data-sfx="success">
         <div class="feature-icon">🌙</div>
         <div>
           <h3>Cutscene<br>Night Audit</h3>
@@ -1641,7 +1697,7 @@ body {
         </div>
       </div>
 
-      <div class="feature-card reveal">
+      <div class="feature-card reveal" data-sfx="click">
         <div class="feature-icon">🔍</div>
         <div>
           <h3>OOP Inspector<br>Live Panel</h3>
@@ -1649,11 +1705,12 @@ body {
         </div>
       </div>
 
-      <div class="feature-card reveal">
+      <div class="feature-card reveal" data-sfx="magic">
         <div class="feature-icon">🎵</div>
         <div>
           <h3>8-Bit SFX<br>Native Web Audio</h3>
-          <p>Setiap interaksi punya bunyi khasnya — click, success chime, error buzz, magic sparkle, coin drop. Semua di-generate via <code>Web Audio API</code>, tanpa file eksternal.</p>
+          <p>Setiap interaksi punya bunyi khas: click, success chime, error buzz, magic sparkle, dan coin drop. Semua dibuat langsung melalui <code>Web Audio API</code> tanpa file eksternal.</p>
+          <span class="footer-badge">Web Audio API</span>
         </div>
       </div>
     </div>
@@ -1670,32 +1727,32 @@ body {
     </div>
 
     <div class="pillars-grid">
-      <div class="pillar-tile reveal">
+      <div class="pillar-tile reveal" data-sfx="click">
         <span class="pillar-icon">🧬</span>
         <h4>INHERITANCE</h4>
         <p>Tiga sub-class naga mewarisi struktur dasar dari <code>Monster</code> via <code>extends</code>. Atribut, method, dan kontrak terbawa otomatis.</p>
       </div>
-      <div class="pillar-tile reveal">
+      <div class="pillar-tile reveal" data-sfx="click">
         <span class="pillar-icon">🎭</span>
         <h4>POLYMORPHISM</h4>
         <p>Method <code>feedElement()</code> & <code>calculateTotalCost()</code> di-override per sub-class. Satu pemanggilan, banyak perilaku.</p>
       </div>
-      <div class="pillar-tile reveal">
+      <div class="pillar-tile reveal" data-sfx="click">
         <span class="pillar-icon">🔒</span>
         <h4>ENCAPSULATION</h4>
         <p>Atribut sensitif seperti <code>_extraCost</code> & <code>_password</code> hanya bisa diakses lewat method publik. Aman dari manipulasi luar.</p>
       </div>
-      <div class="pillar-tile reveal">
+      <div class="pillar-tile reveal" data-sfx="click">
         <span class="pillar-icon">📐</span>
         <h4>ABSTRACTION</h4>
         <p>Class <code>Monster</code> mendefinisikan kontrak abstrak yang harus dipenuhi setiap sub-class. Detail implementasi tersembunyi.</p>
       </div>
-      <div class="pillar-tile reveal">
+      <div class="pillar-tile reveal" data-sfx="click">
         <span class="pillar-icon">🔗</span>
         <h4>AGGREGATION</h4>
         <p>Relasi <code>Room ↔ Monster</code>. Tamu bisa keluar dari kamar tanpa dihancurkan — independent lifecycle.</p>
       </div>
-      <div class="pillar-tile reveal">
+      <div class="pillar-tile reveal" data-sfx="click">
         <span class="pillar-icon">🧱</span>
         <h4>COMPOSITION</h4>
         <p>Relasi <code>ReportManager ◆ Transaction</code>. Transaction tidak bisa hidup di luar Report — dependent lifecycle.</p>
@@ -1719,7 +1776,7 @@ body {
     <p class="cta-subtitle reveal">Lampu lobi sudah menyala. Kunci di tangan. Tamu pertamamu sudah menunggu.</p>
 
     <div class="reveal">
-      <a href="/login" class="btn-mega" id="cta-mega">
+      <a href="/login" class="btn-mega" id="cta-mega" data-sfx="success">
         <span>MULAI SHIFT MALAM</span>
         <span class="arrow">▶</span>
       </a>
@@ -1800,10 +1857,99 @@ body {
   <div class="loader-text">⚡ MEMBUKA PINTU PENGINAPAN... ⚡</div>
 </div>
 
+<script th:src="@{/js/monster-inn-ui.js}"></script>
 <script>
 /* =========================================================
    LANDING PAGE INTERACTIONS
    ========================================================= */
+
+const landingBgm = document.getElementById('landing-bgm');
+const musicToggle = document.getElementById('music-toggle');
+const sfxToggle = document.getElementById('sfx-toggle');
+let musicEnabled = true;
+
+if (landingBgm) {
+  landingBgm.loop = true;
+  landingBgm.volume = 0.35;
+}
+
+function updateMusicToggle(isPlaying) {
+  if (!musicToggle) return;
+  musicToggle.textContent = `MUSIC: ${isPlaying ? 'ON' : 'OFF'}`;
+  musicToggle.setAttribute('aria-pressed', String(isPlaying));
+  musicToggle.setAttribute('aria-label', `${isPlaying ? 'Matikan' : 'Aktifkan'} musik latar`);
+}
+
+function playLandingMusic() {
+  if (!landingBgm || !musicEnabled) return Promise.resolve(false);
+  if (!landingBgm.paused) return Promise.resolve(true);
+  return landingBgm.play()
+    .then(() => {
+      updateMusicToggle(true);
+      return true;
+    })
+    .catch(() => {
+      updateMusicToggle(false);
+      return false;
+    });
+}
+
+function startMusicAfterInteraction(event) {
+  if (event.target instanceof Element && event.target.closest('#music-toggle')) return;
+  playLandingMusic().then((started) => {
+    if (!started) return;
+    document.removeEventListener('pointerdown', startMusicAfterInteraction);
+    document.removeEventListener('keydown', startMusicAfterInteraction);
+  });
+}
+
+document.addEventListener('pointerdown', startMusicAfterInteraction);
+document.addEventListener('keydown', startMusicAfterInteraction);
+
+if (musicToggle) {
+  musicToggle.addEventListener('click', () => {
+    if (!landingBgm) return;
+    if (landingBgm.paused) {
+      musicEnabled = true;
+      playLandingMusic();
+    } else {
+      musicEnabled = false;
+      landingBgm.pause();
+      updateMusicToggle(false);
+    }
+  });
+}
+
+function isModifiedClick(event) {
+  return event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0;
+}
+
+function updateSfxToggle() {
+  if (!sfxToggle || !window.MonsterInnSfx) return;
+  const isEnabled = window.MonsterInnSfx.isEnabled();
+  sfxToggle.textContent = `SFX: ${isEnabled ? 'ON' : 'OFF'}`;
+  sfxToggle.setAttribute('aria-pressed', String(isEnabled));
+  sfxToggle.setAttribute('aria-label', `${isEnabled ? 'Matikan' : 'Aktifkan'} efek suara`);
+}
+
+updateSfxToggle();
+
+if (sfxToggle && window.MonsterInnSfx) {
+  sfxToggle.addEventListener('click', () => {
+    const isEnabled = window.MonsterInnSfx.toggle();
+    updateSfxToggle();
+    if (isEnabled) window.MonsterInnSfx.play('click');
+  });
+}
+
+document.querySelectorAll('[data-sfx]').forEach((element) => {
+  element.addEventListener('click', (event) => {
+    if (isModifiedClick(event)) return;
+    if (window.MonsterInnSfx) {
+      window.MonsterInnSfx.play(element.dataset.sfx);
+    }
+  });
+});
 
 // Navbar shrink on scroll
 const navbar = document.getElementById('navbar');
@@ -1826,26 +1972,10 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // Page transition when clicking "Masuk Inn"
 function navigateWithTransition(e, href) {
+  if (isModifiedClick(e)) return;
   e.preventDefault();
   const overlay = document.getElementById('transition-overlay');
   overlay.classList.add('active');
-  // Small audio cue
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const playBeep = (freq, delay, dur=0.15) => {
-      setTimeout(() => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.value = freq;
-        gain.gain.value = 0.08;
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
-        osc.connect(gain).connect(ctx.destination);
-        osc.start(); osc.stop(ctx.currentTime + dur);
-      }, delay);
-    };
-    [523, 659, 784, 1046].forEach((f, i) => playBeep(f, i * 100, 0.15));
-  } catch(e) {}
   setTimeout(() => { window.location.href = href; }, 800);
 }
 
@@ -1859,6 +1989,7 @@ function navigateWithTransition(e, href) {
 // Smooth scroll for anchor links (already handled by CSS but ensure focus)
 document.querySelectorAll('.nav-links a[href^="#"], .btn-secondary[href^="#"]').forEach(link => {
   link.addEventListener('click', function(e) {
+    if (isModifiedClick(e)) return;
     const target = document.querySelector(this.getAttribute('href'));
     if (target) {
       e.preventDefault();

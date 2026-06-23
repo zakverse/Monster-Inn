@@ -36,3 +36,11 @@ mysql-runtime.log
 .codex-run-hidden.vbs
 .codex-run-mysql.cmd
 .codex-run-server.cmd
+
+### Local agent/documentation/runtime files ###
+.codex/
+.agents/
+docs/
+Asset/
+app.log
+app-error.log
