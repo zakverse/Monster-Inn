@@ -26,6 +26,9 @@ public class Transaction {
     private double serviceTotal;
     private double prepaidAmount;
     private double totalCost;
+    // FIX CHECKOUT PREPAID REFUND: field settlement checkout dipisah dari total biaya kotor.
+    private double remainingDue;
+    private double refundAmount;
     private double paymentAmount;
     private double changeAmount;
     private LocalDateTime checkoutTime;
@@ -48,17 +51,21 @@ public class Transaction {
         this.element = monster.getElement();
         this.roomId = room.getRoomId();
         this.stayDays = monster.getStayDays();
+        // FIX CHECKOUT PREPAID REFUND: totalCost adalah biaya asli, uang muka hanya mengurangi sisa bayar.
+        this.roomTotal = Math.max(monster.calculateTotalCost() - monster.getExtraCost(), 0);
         this.serviceTotal = monster.getExtraCost();
-        this.roomTotal = monster.calculateTotalCost() - monster.getExtraCost();
         this.prepaidAmount = monster.getPrepaidAmount();
-        this.totalCost = Math.max(0, monster.calculateTotalCost() - monster.getPrepaidAmount());
-        this.paymentAmount = paymentAmount;
-        this.changeAmount = Math.max(0, paymentAmount - this.totalCost);
+        this.totalCost = this.roomTotal + this.serviceTotal;
+        this.remainingDue = Math.max(this.totalCost - this.prepaidAmount, 0);
+        this.refundAmount = Math.max(this.prepaidAmount - this.totalCost, 0);
+        // FIX CHECKOUT PREPAID REFUND: pembayaran checkout tidak boleh negatif.
+        this.paymentAmount = Math.max(paymentAmount, 0);
+        this.changeAmount = Math.max(this.paymentAmount - this.remainingDue, 0);
         this.checkoutTime = LocalDateTime.now();
         this.serviceLog = new ArrayList<>(monster.getServiceLog());
         
         // Pemicu mutlak status kelunasan saat objek memori pertama kali dibangun
-        this.paid = paymentAmount >= this.totalCost;
+        this.paid = this.remainingDue == 0 || this.paymentAmount >= this.remainingDue;
     }
 
     public double calculateTotal() {
@@ -70,7 +77,10 @@ public class Transaction {
     }
 
     public boolean processPayment() {
-        this.paid = paymentAmount >= totalCost;
+        // FIX CHECKOUT PREPAID REFUND: lunas jika sisa bayar 0 atau pembayaran tambahan mencukupi.
+        this.paymentAmount = Math.max(paymentAmount, 0);
+        this.changeAmount = Math.max(this.paymentAmount - this.remainingDue, 0);
+        this.paid = this.remainingDue == 0 || this.paymentAmount >= this.remainingDue;
         return paid;
     }
 
