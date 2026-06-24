@@ -33,7 +33,7 @@ public class TransactionController {
     public String showCheckoutPage(Model model) {
         model.addAttribute("activeGuests", monsterRepo.findAll());
         model.addAttribute("activePage", "checkout");
-        return "view/checkout"; 
+        return "view/checkout";
     }
 
     // 2. API untuk Ambil Info Tagihan (Dipakai JS Frontend)
@@ -48,18 +48,30 @@ public class TransactionController {
         Room room = roomRepo.findById(monster.getRoomId()).orElse(null);
         if (room == null) return ResponseEntity.badRequest().body("Kamar tidak ditemukan.");
 
+        // FIX CHECKOUT PREPAID REFUND: API mengirim total biaya, sisa bayar, dan refund sebagai nilai terpisah.
+        double roomTotal = Math.max(monster.calculateTotalCost() - monster.getExtraCost(), 0);
+        double serviceTotal = monster.getExtraCost();
+        double prepaid = monster.getPrepaidAmount();
+        double grossTotal = roomTotal + serviceTotal;
+        double remainingDue = Math.max(grossTotal - prepaid, 0);
+        double refundAmount = Math.max(prepaid - grossTotal, 0);
+        double dailyRoomRate = monster.getStayDays() > 0 ? roomTotal / monster.getStayDays() : 0;
+
         Map<String, Object> data = new HashMap<>();
         data.put("monsterName", monster.getName());
         data.put("roomId", monster.getRoomId());
         data.put("stayDays", monster.getStayDays());
-        data.put("roomRate", room.getRoomRate());
-        data.put("roomTotal", room.getRoomRate() * monster.getStayDays());
-        data.put("extraCost", monster.getExtraCost());
-        data.put("prepaid", monster.getPrepaidAmount());
+        data.put("roomRate", dailyRoomRate);
+        data.put("roomTotal", roomTotal);
+        data.put("extraCost", serviceTotal);
+        data.put("serviceTotal", serviceTotal);
+        data.put("prepaid", prepaid);
+        data.put("grossTotal", grossTotal);
+        data.put("totalCost", grossTotal);
+        data.put("remainingDue", remainingDue);
+        data.put("refundAmount", refundAmount);
+        data.put("grandTotal", remainingDue);
         data.put("serviceLog", monster.getServiceLog());
-        
-        // Rumus Induk Tagihan: (Sewa Kamar * Hari) + Biaya Layanan Extra - Uang Muka Deposit
-        data.put("grandTotal", (room.getRoomRate() * monster.getStayDays()) + monster.getExtraCost() - monster.getPrepaidAmount());
 
         return ResponseEntity.ok(data);
     }
@@ -71,7 +83,7 @@ public class TransactionController {
         Monster monster = monsterRepo.findById(id).orElse(null);
         if (monster == null) {
             Map<String, String> error = new HashMap<>();
-            error.put("message", "Data naga tidak ada.");
+            error.put("message", "Data tamu tidak ada.");
             return ResponseEntity.badRequest().body(error);
         }
 
@@ -82,25 +94,41 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(error);
         }
 
-        // Ambil nominal bayar dari request payload JS frontend (default ke 0 jika kosong)
-        double inputPayment = payload.get("paymentAmount") != null ? Double.parseDouble(payload.get("paymentAmount").toString()) : 0;
-
-        // CALCULATE GRAND TOTAL BERDASARKAN FORMULA UTAMA DI BACKEND
-        double grandTotal = (room.getRoomRate() * monster.getStayDays()) + monster.getExtraCost() - monster.getPrepaidAmount();
-
-        // VALIDASI MUTLAK: Tolak transaksi di level server jika nominal emas kurang dari total tagihan induk!
-        if (inputPayment < grandTotal) {
+        double inputPayment;
+        try {
+            inputPayment = payload.get("paymentAmount") != null
+                    ? Double.parseDouble(payload.get("paymentAmount").toString())
+                    : 0;
+        } catch (NumberFormatException ex) {
             Map<String, String> error = new HashMap<>();
-            error.put("message", "⚠ Gagal checkout: Uang pembayaran kurang dari total tagihan induk! Tamu dilarang keluar.");
+            error.put("message", "Nominal pembayaran tidak valid.");
             return ResponseEntity.badRequest().body(error);
         }
 
-        // Instansiasi objek transaksi baru memanfaatkan Constructor utama model Transaction lu
+        if (Double.isNaN(inputPayment) || Double.isInfinite(inputPayment) || inputPayment < 0) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Nominal pembayaran tidak boleh negatif.");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        // FIX CHECKOUT PREPAID REFUND: backend validasi pembayaran terhadap sisa bayar, bukan total negatif.
+        double roomTotal = Math.max(monster.calculateTotalCost() - monster.getExtraCost(), 0);
+        double grossTotal = roomTotal + monster.getExtraCost();
+        double remainingDue = Math.max(grossTotal - monster.getPrepaidAmount(), 0);
+
+        if (remainingDue > 0 && inputPayment < remainingDue) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Gagal checkout: Uang pembayaran kurang dari sisa bayar.");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        // Instansiasi objek transaksi baru memanfaatkan constructor utama model Transaction.
         Transaction riwayatBaru = new Transaction(monster, room, inputPayment);
-        
-        // REKAYASA PENYELAMATAN STATE: Panggil method internal dan paksa boolean paid bernilai TRUE
-        riwayatBaru.processPayment(); 
-        riwayatBaru.setPaid(true); // <--- KUNCI LUNAS DI SINI BIAR TIDAK DI-RESET KEMBALI JADI FALSE OLEH HIBERNATE
+        if (!riwayatBaru.processPayment()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Gagal checkout: Transaksi belum lunas.");
+            return ResponseEntity.badRequest().body(error);
+        }
 
         // Simpan nota permanen ke database MySQL laporan
         transactionRepo.save(riwayatBaru);
@@ -111,7 +139,7 @@ public class TransactionController {
         room.setStatus(RoomStatus.DIRTY);
         roomRepo.save(room);
 
-        // Hapus data naga/monster dari tabel aktif hunian (Monsters)
+        // Hapus data monster dari tabel aktif hunian (Monsters)
         monsterRepo.delete(monster);
 
         Map<String, String> response = new HashMap<>();

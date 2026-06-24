@@ -81,14 +81,27 @@
                             <span id="inv-val-room" class="font-bold"></span>
                         </div>
                         <div id="inv-services" class="pt-2 space-y-1" style="border-top: 1px solid #3a2e28;"></div>
+                        <!-- FIX CHECKOUT PREPAID REFUND: invoice memisahkan total biaya kotor dari sisa bayar/refund. -->
+                        <div class="flex justify-between">
+                            <span>Layanan Tambahan</span>
+                            <span id="inv-val-service" class="font-bold"></span>
+                        </div>
                         <div class="pt-4 mt-6" style="border-top: 4px solid #3a2e28;">
                             <div class="flex justify-between" style="opacity: 0.6;">
                                 <span>Uang Muka:</span>
                                 <span id="inv-val-prepaid"></span>
                             </div>
+                            <div class="flex justify-between mt-2">
+                                <span>Total Biaya:</span>
+                                <span id="inv-val-gross" class="font-bold"></span>
+                            </div>
                             <div class="flex justify-between text-3xl font-bold mt-2">
-                                <span>TOTAL:</span>
+                                <span>Sisa Bayar:</span>
                                 <span id="inv-val-total"></span>
+                            </div>
+                            <div id="inv-refund-row" class="flex justify-between text-2xl font-bold mt-2 hidden" style="color: #a74520;">
+                                <span>Refund/Kembalian:</span>
+                                <span id="inv-val-refund"></span>
                             </div>
                         </div>
                     </div>
@@ -127,6 +140,7 @@
     <script th:inline="javascript">
         let selectedGuestId = null;
         let latestGrandTotal = 0;
+        let latestRefundAmount = 0;
         let confirmCallback = null;
 
         function openPixelModal(options) {
@@ -165,7 +179,13 @@
 
             const res = await fetch(`/api/checkout-info/${guestId}`);
             const data = await res.json();
-            latestGrandTotal = Number(data.grandTotal || 0);
+            // FIX CHECKOUT PREPAID REFUND: alur UI mengikuti field dari API, tidak menghitung TOTAL negatif.
+            const roomTotal = Number(data.roomTotal || 0);
+            const serviceTotal = Number(data.serviceTotal || data.extraCost || 0);
+            const prepaid = Number(data.prepaid || 0);
+            const grossTotal = Number(data.grossTotal ?? data.totalCost ?? 0);
+            latestGrandTotal = Number(data.remainingDue ?? data.grandTotal ?? 0);
+            latestRefundAmount = Number(data.refundAmount ?? 0);
 
             document.getElementById('invoice-ui').classList.remove('hidden');
             document.getElementById('room-info').classList.remove('hidden');
@@ -173,10 +193,20 @@
 
             document.getElementById('info-room').innerText = "#" + data.roomId;
             document.getElementById('info-stay').innerText = data.stayDays + " Malam";
-            document.getElementById('inv-val-room').innerText = "Rp " + data.roomTotal.toLocaleString('id-ID');
-            document.getElementById('inv-val-prepaid').innerText = "- Rp " + data.prepaid.toLocaleString('id-ID');
+            document.getElementById('inv-val-room').innerText = "Rp " + roomTotal.toLocaleString('id-ID');
+            document.getElementById('inv-val-service').innerText = "Rp " + serviceTotal.toLocaleString('id-ID');
+            document.getElementById('inv-val-prepaid').innerText = "Rp " + prepaid.toLocaleString('id-ID');
+            document.getElementById('inv-val-gross').innerText = "Rp " + grossTotal.toLocaleString('id-ID');
             document.getElementById('inv-val-total').innerText = "Rp " + latestGrandTotal.toLocaleString('id-ID');
-            document.getElementById('payment-amount').value = latestGrandTotal;
+
+            const paymentInput = document.getElementById('payment-amount');
+            paymentInput.value = latestGrandTotal;
+            paymentInput.min = 0;
+            paymentInput.disabled = latestGrandTotal === 0;
+
+            const refundRow = document.getElementById('inv-refund-row');
+            document.getElementById('inv-val-refund').innerText = "Rp " + latestRefundAmount.toLocaleString('id-ID');
+            refundRow.classList.toggle('hidden', latestRefundAmount <= 0);
 
             let servicesHtml = data.serviceLog.map(s => `<div class="flex justify-between text-lg" style="font-style:italic;"><span>+ ${s}</span></div>`).join('');
             document.getElementById('inv-services').innerHTML = servicesHtml || '<p class="text-sm" style="font-style:italic;">Tanpa layanan tambahan</p>';
@@ -193,7 +223,14 @@
                 return;
             }
 
-            // FILTER KETAT FRONTEND: Kunci pergerakan kasir jika input pembayaran kurang uang emasnya!
+            // FIX CHECKOUT PREPAID REFUND: kasir tidak perlu dan tidak boleh mengisi pembayaran negatif.
+            if (paymentAmount < 0) {
+                errorEl.innerText = "Nominal pembayaran tidak boleh negatif.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            // FILTER KETAT FRONTEND: Kunci pergerakan kasir jika input pembayaran kurang dari sisa bayar.
             if (paymentAmount < latestGrandTotal) {
                 errorEl.innerText = `⚠ Pembayaran Kurang! Sisa kekurangan: Rp ${(latestGrandTotal - paymentAmount).toLocaleString('id-ID')}`;
                 errorEl.classList.remove('hidden');
@@ -201,7 +238,7 @@
                 openPixelModal({
                     type: 'alert',
                     title: '⚠ DENDA EMAS KURANG ⚠',
-                    message: `Nominal pembayaran kurang dari total tagihan! Kurang sebesar: Rp ${(latestGrandTotal - paymentAmount).toLocaleString('id-ID')}. Monster dilarang meninggalkan kamar!`,
+                    message: `Nominal pembayaran kurang dari sisa bayar! Kurang sebesar: Rp ${(latestGrandTotal - paymentAmount).toLocaleString('id-ID')}. Monster dilarang meninggalkan kamar!`,
                     icon: 'fa-coins',
                     iconColor: '#a74520'
                 });
