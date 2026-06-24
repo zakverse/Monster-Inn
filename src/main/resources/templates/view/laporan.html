@@ -23,7 +23,7 @@
         ::-webkit-scrollbar-thumb { background: #3a2e28; }
     </style>
 </head>
-<body class="mi-app-shell flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen" data-page="report" data-music-scope="main-app">
 
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
@@ -112,5 +112,6 @@
         </div>
     </main>
     <script defer th:src="@{/js/monster-inn-ui.js}"></script>
+    <script defer th:src="@{/js/monster-inn-music.js}"></script>
 </body>
 </html>

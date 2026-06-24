@@ -47,7 +47,7 @@
         .pixel-modal-btn:active { transform: translate(2px, 2px); box-shadow: none; }
     </style>
 </head>
-<body class="mi-app-shell flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen" data-page="checkout" data-music-scope="main-app">
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
     <main class="flex-1 p-8 overflow-y-auto" style="margin-left: 260px;">
@@ -266,5 +266,6 @@
         }
     </script>
     <script defer th:src="@{/js/monster-inn-ui.js}"></script>
+    <script defer th:src="@{/js/monster-inn-music.js}"></script>
 </body>
 </html>

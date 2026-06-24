@@ -15,7 +15,8 @@
         .text-retro { font-family: 'VT323', monospace; }
     </style>
 </head>
-<body class="mi-app-shell flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen" data-page="dashboard" data-music-scope="main-app">
+
 
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
     
@@ -25,9 +26,11 @@
                 <h2 class="text-pixel text-xl tracking-wider uppercase" style="color: #ffd96b;">Overview Gua</h2>
                 <p class="text-retro text-xl mt-2" style="color: #9c7ac4;">Selamat datang di terminal penginapan isekai anda.</p>
             </div>
-            <div class="text-right" style="color: #d4a94a;">
-                <p class="text-pixel uppercase" style="font-size: 10px;">Isekai Time</p>
-                <p class="text-retro text-2xl" th:text="${#calendars.format(#calendars.createNow(), 'EEEE, dd MMMM yyyy')}">Sunday, May 3, 2026</p>
+            <div class="flex flex-col items-end gap-3 text-right" style="color: #d4a94a;">
+                <div>
+                    <p class="text-pixel uppercase" style="font-size: 10px; margin: 0;">Isekai Time</p>
+                    <p class="text-retro text-2xl" th:text="${#calendars.format(#calendars.createNow(), 'EEEE, dd MMMM yyyy')}" style="margin: 4px 0 0 0;">Sunday, May 3, 2026</p>
+                </div>
             </div>
         </header>
 
@@ -85,6 +88,9 @@
             </table>
         </div>
     </main>
+
+
     <script defer th:src="@{/js/monster-inn-ui.js}"></script>
+    <script defer th:src="@{/js/monster-inn-music.js}"></script>
 </body>
 </html>

@@ -31,7 +31,7 @@
         @keyframes flashIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="mi-app-shell flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen" data-page="registration" data-music-scope="main-app">
 
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
@@ -139,5 +139,6 @@
         }
     </script>
     <script defer th:src="@{/js/monster-inn-ui.js}"></script>
+    <script defer th:src="@{/js/monster-inn-music.js}"></script>
 </body>
 </html>

@@ -19,6 +19,39 @@
     box-sizing: border-box;
 }
 
+/* Custom Pixel-Art Cursor */
+html,
+body,
+.mi-page,
+.mi-app-shell,
+.mi-pixel-card,
+.pixel-card,
+.mi-monster-card,
+.mi-feature-card,
+.mi-oop-card,
+.room-box,
+.element-card,
+.service-item,
+input,
+select,
+textarea,
+label {
+    cursor: auto;
+}
+
+/* Clickable Interactive Elements */
+button,
+a,
+[role="button"],
+.mi-btn,
+.mi-menu-toggle,
+.clickable,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+    cursor: pointer;
+}
+
 html {
     scroll-behavior: smooth;
 }

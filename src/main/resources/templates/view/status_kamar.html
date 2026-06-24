@@ -34,7 +34,7 @@
         .flash-success p { font-family: 'VT323', monospace; font-size: 22px; color: #b5d4a8; }
     </style>
 </head>
-<body class="mi-app-shell flex min-h-screen">
+<body class="mi-app-shell flex min-h-screen" data-page="room-status" data-music-scope="main-app">
 
     <div th:replace="~{layout/sidebar :: monster-sidebar}"></div>
 
@@ -164,5 +164,6 @@
         </section>
     </main>
     <script defer th:src="@{/js/monster-inn-ui.js}"></script>
+    <script defer th:src="@{/js/monster-inn-music.js}"></script>
 </body>
 </html>

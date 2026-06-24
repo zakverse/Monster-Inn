@@ -1313,11 +1313,8 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
 </style>
 </head>
-<body>
+<body data-page="landing" data-music-scope="lobby">
 
-<audio id="landing-bgm" loop preload="auto">
-  <source th:src="@{/images/audio/Sunrise_at_the_Gate.mp3}" type="audio/mpeg">
-</audio>
 
 <!-- ============ NAVBAR ============ -->
 <nav class="navbar" id="navbar">
@@ -1335,8 +1332,12 @@ body {
 </nav>
 
 <div class="audio-toggles" aria-label="Kontrol audio landing page">
-  <button class="audio-toggle" id="music-toggle" type="button" aria-pressed="false" aria-label="Aktifkan musik latar">
-    MUSIC: OFF
+  <button class="audio-toggle" id="music-toggle"
+          data-mi-music-toggle
+          data-label-on="Lagu Lobi: ON"
+          data-label-off="Lagu Lobi: OFF"
+          type="button" aria-pressed="false" aria-label="Aktifkan musik latar">
+    Lagu Lobi: OFF
   </button>
   <button class="audio-toggle" id="sfx-toggle" type="button" aria-pressed="true" aria-label="Matikan efek suara">
     SFX: ON
@@ -1858,67 +1859,13 @@ body {
 </div>
 
 <script th:src="@{/js/monster-inn-ui.js}"></script>
+<script th:src="@{/js/monster-inn-music.js}"></script>
 <script>
 /* =========================================================
    LANDING PAGE INTERACTIONS
    ========================================================= */
 
-const landingBgm = document.getElementById('landing-bgm');
-const musicToggle = document.getElementById('music-toggle');
 const sfxToggle = document.getElementById('sfx-toggle');
-let musicEnabled = true;
-
-if (landingBgm) {
-  landingBgm.loop = true;
-  landingBgm.volume = 0.35;
-}
-
-function updateMusicToggle(isPlaying) {
-  if (!musicToggle) return;
-  musicToggle.textContent = `MUSIC: ${isPlaying ? 'ON' : 'OFF'}`;
-  musicToggle.setAttribute('aria-pressed', String(isPlaying));
-  musicToggle.setAttribute('aria-label', `${isPlaying ? 'Matikan' : 'Aktifkan'} musik latar`);
-}
-
-function playLandingMusic() {
-  if (!landingBgm || !musicEnabled) return Promise.resolve(false);
-  if (!landingBgm.paused) return Promise.resolve(true);
-  return landingBgm.play()
-    .then(() => {
-      updateMusicToggle(true);
-      return true;
-    })
-    .catch(() => {
-      updateMusicToggle(false);
-      return false;
-    });
-}
-
-function startMusicAfterInteraction(event) {
-  if (event.target instanceof Element && event.target.closest('#music-toggle')) return;
-  playLandingMusic().then((started) => {
-    if (!started) return;
-    document.removeEventListener('pointerdown', startMusicAfterInteraction);
-    document.removeEventListener('keydown', startMusicAfterInteraction);
-  });
-}
-
-document.addEventListener('pointerdown', startMusicAfterInteraction);
-document.addEventListener('keydown', startMusicAfterInteraction);
-
-if (musicToggle) {
-  musicToggle.addEventListener('click', () => {
-    if (!landingBgm) return;
-    if (landingBgm.paused) {
-      musicEnabled = true;
-      playLandingMusic();
-    } else {
-      musicEnabled = false;
-      landingBgm.pause();
-      updateMusicToggle(false);
-    }
-  });
-}
 
 function isModifiedClick(event) {
   return event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0;
@@ -1974,9 +1921,11 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 function navigateWithTransition(e, href) {
   if (isModifiedClick(e)) return;
   e.preventDefault();
+  // Save music state before navigating so login page can continue
+  if (window.MonsterInnMusic) window.MonsterInnMusic.saveState();
   const overlay = document.getElementById('transition-overlay');
   overlay.classList.add('active');
-  setTimeout(() => { window.location.href = href; }, 800);
+  setTimeout(() => { window.location.href = href; }, 480);
 }
 
 ['hero-cta', 'cta-mega', 'nav-cta'].forEach(id => {

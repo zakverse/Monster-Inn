@@ -153,6 +153,48 @@
             </button>
         </form>
     </div>
+    
+    <!-- ===== DASHBOARD BGM FLOATING WIDGET (bottom-right) ===== -->
+    <div id="bgm-widget" style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 8px;
+        background: #1e1825;
+        color: #f4e8d0;
+        border: 2px solid #3a2e28;
+        box-shadow: 4px 4px 0 #000;
+        text-transform: uppercase;
+        user-select: none;
+        pointer-events: auto;
+    ">
+        <button id="dashboard-music-toggle"
+                data-mi-music-toggle
+                data-label-on="Lagu Penginapan: ON"
+                data-label-off="Lagu Penginapan: OFF"
+                type="button" title="Toggle BGM" style="
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            cursor: pointer;
+            padding: 0;
+            outline: none;
+        ">
+            <i class="fa-solid fa-volume-xmark" data-mi-icon style="font-size: 11px;"></i>
+            <span data-mi-text>Lagu Penginapan: OFF</span>
+        </button>
+    </div>
 </nav>
 </body>
 </html>
