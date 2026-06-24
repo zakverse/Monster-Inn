@@ -44,3 +44,11 @@ docs/
 Asset/
 app.log
 app-error.log
+
+### Server runtime logs ###
+server.log
+server.err
+server-run.log
+server-run.err
+server-live.log
+server-live.err
