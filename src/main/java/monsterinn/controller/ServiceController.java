@@ -38,6 +38,9 @@ public class ServiceController {
         // FIX KEBOCORAN DATA: Pastikan mengambil data MASTER MENU yang sah dari serviceRepository!
         model.addAttribute("allServices", serviceRepository.findAll());
         
+        // Load all service requests to display on the service dashboard
+        model.addAttribute("serviceRequests", requestRepository.findAll());
+        
         model.addAttribute("activePage", "layanan");
         return "view/layanan";
     }
@@ -63,6 +66,22 @@ public class ServiceController {
             
             requestRepository.save(request);
             return ResponseEntity.ok("✦ Layanan berhasil ditambahkan! ✦");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Gagal: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/complete/{id}")
+    @ResponseBody
+    public ResponseEntity<String> completeService(@PathVariable Integer id) {
+        try {
+            ServiceRequest request = requestRepository.findById(id).orElse(null);
+            if (request == null) {
+                return ResponseEntity.status(404).body("Permintaan layanan tidak ditemukan.");
+            }
+            request.setServed(true);
+            requestRepository.save(request);
+            return ResponseEntity.ok("✦ Layanan diselesaikan! ✦");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Gagal: " + e.getMessage());
         }

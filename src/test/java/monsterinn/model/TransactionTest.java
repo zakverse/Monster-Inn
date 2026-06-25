@@ -70,6 +70,36 @@ class TransactionTest {
         assertTrue(transaction.processPayment());
     }
 
+    @Test
+    void testTotalKamarPlusLayananMinusDeposit() {
+        // Room rate: 150000, surcharge: 25000 -> 175000 per day.
+        // stayDays: 3 days -> Room total = 175000 * 3 = 525000.
+        // serviceTotal (Layanan): 60000.
+        // Deposit (Prepaid): 200000.
+        // Expected gross total cost = 525000 + 60000 = 585000.
+        // Remaining due (Sisa Bayar) = 585000 - 200000 = 385000.
+        
+        Monster monster = new FireMonster("M99", "Pyro", 150000, 25000);
+        monster.setRoomId("F-99");
+        monster.setStayDays(3);
+        monster.setPrepaidAmount(200000);
+        monster.pushService("Injeksi Magma", 60000);
+
+        Room room = new Room("F-99", "FIRE", 150000);
+        room.checkIn(monster);
+
+        // Kasir melunasi dengan input sisa bayar (385000)
+        Transaction transaction = new Transaction(monster, room, 385000);
+
+        assertEquals(585000, transaction.getTotalCost());
+        assertEquals(200000, transaction.getPrepaidAmount());
+        assertEquals(385000, transaction.getRemainingDue());
+        assertEquals(0, transaction.getRefundAmount());
+        assertEquals(385000, transaction.getPaymentAmount());
+        assertEquals(0, transaction.getChangeAmount());
+        assertTrue(transaction.processPayment());
+    }
+
     private Monster checkedInFireMonster(String monsterId, String name, String roomId, double roomRate, double serviceTotal, double prepaid) {
         Monster monster = new FireMonster(monsterId, name, roomRate, 0);
         monster.setRoomId(roomId);

@@ -35,6 +35,7 @@ public class RegistrasiController {
                                     @RequestParam("elemen") String elemen,
                                     @RequestParam("noKamar") String roomId,
                                     @RequestParam("deposit") double deposit,
+                                    @RequestParam(value = "stayDays", defaultValue = "1") int stayDays,
                                     RedirectAttributes redirectAttributes) {
         try {
             // 1. Ambil Kamar dari Database
@@ -54,6 +55,7 @@ public class RegistrasiController {
             }
 
             monsterBaru.setPrepaidAmount(deposit);
+            monsterBaru.setStayDays(stayDays);
 
             // 3. PBO Logic (Hubungkan tamu ke kamar & sinkronisasi ID)
             kamar.checkIn(monsterBaru);

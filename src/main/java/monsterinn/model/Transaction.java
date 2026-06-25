@@ -98,4 +98,21 @@ public class Transaction {
     public List<String> getServiceLog() {
         return List.copyOf(serviceLog);
     }
+
+    // --- OOP ALIAS GETTERS FOR ASSIGNMENT WEEK 11 ---
+    public String getBookedRoom() {
+        return this.roomId;
+    }
+
+    public String getGuest() {
+        return this.guestName;
+    }
+
+    public int getDurationDays() {
+        return this.stayDays;
+    }
+
+    public double getPaidAmount() {
+        return this.paymentAmount;
+    }
 }

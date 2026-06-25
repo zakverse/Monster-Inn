@@ -106,6 +106,50 @@
                 </div>
             </div>
         </div>
+
+        <!-- SECTION DASHBOARD PERMINTAAN LAYANAN (WEEK 10) -->
+        <section class="mt-12 pixel-card overflow-hidden">
+            <div class="p-4 flex justify-between items-center" style="background: #3a2e28; border-bottom: 4px solid #000;">
+                <h3 class="text-pixel" style="font-size: 10px; color: #ffd96b; margin: 0;">DASHBOARD PERMINTAAN LAYANAN</h3>
+                <span class="text-retro text-xl" style="color: #9c7ac4;">Status Perawatan Monster</span>
+            </div>
+            <table class="w-full text-retro text-xl" style="text-align: left;">
+                <thead style="background: rgba(15,11,20,0.5); color: #9c7ac4; border-bottom: 2px solid #3a2c1c;">
+                    <tr>
+                        <th class="px-6 py-4">NO. KAMAR</th>
+                        <th class="px-6 py-4">ID TAMU</th>
+                        <th class="px-6 py-4">NAMA LAYANAN</th>
+                        <th class="px-6 py-4">BIAYA</th>
+                        <th class="px-6 py-4">STATUS</th>
+                        <th class="px-6 py-4 text-center">AKSI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="req : ${serviceRequests}" style="transition: background 0.15s;"
+                        onmouseover="this.style.background='rgba(58,46,40,0.3)'"
+                        onmouseout="this.style.background='transparent'">
+                        <td class="px-6 py-4 font-bold" style="color: #f4e8d0;" th:text="${'#' + req.roomId}">#F-101</td>
+                        <td class="px-6 py-4" th:text="${req.guestId}">Guest ID</td>
+                        <td class="px-6 py-4" th:text="${req.orderName}">Layanan</td>
+                        <td class="px-6 py-4" th:text="'Rp ' + ${#numbers.formatDecimal(req.rate, 0, 'POINT', 0, 'COMMA')}">Rp 50.000</td>
+                        <td class="px-6 py-4">
+                            <span th:if="${req.served}" class="px-3 py-1" style="background: rgba(133,166,122,0.2); color: #85a67a; border: 2px solid #85a67a; font-family: 'Press Start 2P', monospace; font-size: 8px;">COMPLETED</span>
+                            <span th:if="${!req.served}" class="px-3 py-1" style="background: rgba(232,115,74,0.2); color: #e8734a; border: 2px solid #e8734a; font-family: 'Press Start 2P', monospace; font-size: 8px;">PENDING</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button th:if="${!req.served}" th:onclick="'completeRequest(' + ${req.id} + ')'"
+                                class="px-3 py-1" style="font-size: 8px; font-family: 'Press Start 2P', monospace; background: #85a67a; color: #000; border: 2px solid #000; cursor: pointer; transition: all 0.15s;"
+                                onmouseover="this.style.background='#b5d4a8'"
+                                onmouseout="this.style.background='#85a67a'">SELESAI</button>
+                            <span th:if="${req.served}" style="color: #888;">—</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(serviceRequests)}">
+                        <td colspan="6" class="px-6 py-10 text-center italic" style="color: #9c7ac4;">Belum ada permintaan layanan...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
     </main>
 
     <!-- CONTAINER CONTAINER KUSTOM POP-UP MODAL RPG -->
@@ -143,7 +187,10 @@
                 `;
             } else {
                 actionContainer.innerHTML = `
-                    <button onclick="closePixelModal();" class="pixel-modal-btn bg-[#d4a94a] border-[#8c6d2d] text-black shadow-[4px_4px_0_#000]">MENGERTI</button>
+                    <button onclick="closePixelModal(); ${options.redirect ? `window.location.href='${options.redirect}';` : ''}" 
+                            class="pixel-modal-btn bg-[#d4a94a] border-[#8c6d2d] text-black shadow-[4px_4px_0_#000]">
+                        MENGERTI
+                    </button>
                 `;
             }
             document.getElementById('custom-modal').classList.add('active');
@@ -324,11 +371,55 @@
                 title: '✦ TRANSAKSI BERHASIL ✦',
                 message: 'Semua berkas layanan perawatan spesifik berhasil dicatat ke tagihan induk kamar!',
                 icon: 'fa-square-check',
-                iconColor: '#85a67a'
+                iconColor: '#85a67a',
+                redirect: '/layanan'
             });
 
             resetCart();
             updateServices(); 
+        }
+
+        // AKSI SELESAIKAN LAYANAN AJAX FETCH (WEEK 10)
+        async function completeRequest(requestId) {
+            const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+            const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+            try {
+                const res = await fetch(`/layanan/complete/${requestId}`, {
+                    method: 'POST',
+                    headers: {
+                        [header]: token
+                    }
+                });
+                if (res.ok) {
+                    openPixelModal({
+                        type: 'alert',
+                        title: '✦ SUKSES ✦',
+                        message: 'Status layanan berhasil diubah menjadi COMPLETED!',
+                        icon: 'fa-circle-check',
+                        iconColor: '#85a67a',
+                        redirect: '/layanan'
+                    });
+                } else {
+                    const errMsg = await res.text();
+                    openPixelModal({
+                        type: 'alert',
+                        title: '✦ GAGAL ✦',
+                        message: 'Gagal mengubah status layanan: ' + errMsg,
+                        icon: 'fa-triangle-exclamation',
+                        iconColor: '#e8734a'
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                openPixelModal({
+                    type: 'alert',
+                    title: '✦ ERROR ✦',
+                    message: 'Koneksi ke server terputus.',
+                    icon: 'fa-triangle-exclamation',
+                    iconColor: '#e8734a'
+                });
+            }
         }
     </script>
     <script defer th:src="@{/js/monster-inn-ui.js}"></script>
