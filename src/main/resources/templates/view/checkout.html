@@ -25,6 +25,63 @@
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
+        /* --- STRUK TRANSAKSI / RECEIPT PANEL --- */
+        .receipt-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 2, 8, 0.90); display: flex; align-items: center; justify-content: center;
+            z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease-in-out;
+            backdrop-filter: blur(4px);
+        }
+        .receipt-overlay.active { opacity: 1; pointer-events: auto; }
+        .receipt-panel {
+            background: linear-gradient(170deg, #f4e8d0 0%, #e8d5b0 40%, #dcc8a0 100%);
+            color: #3a2e28; border: 5px solid #3a2e28;
+            width: 520px; max-height: 90vh; overflow-y: auto;
+            padding: 32px 28px; position: relative;
+            box-shadow: 0 0 0 5px #16111d, 0 0 40px rgba(255, 217, 107, 0.3), 16px 16px 0 rgba(0,0,0,0.6);
+            transform: scale(0.7) translateY(30px); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .receipt-overlay.active .receipt-panel { transform: scale(1) translateY(0); }
+        .receipt-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(58,46,40,0.04) 28px, rgba(58,46,40,0.04) 29px);
+            pointer-events: none;
+        }
+        .receipt-header { text-align: center; padding-bottom: 16px; border-bottom: 3px dashed #3a2e28; margin-bottom: 16px; }
+        .receipt-header h3 { font-family: 'Press Start 2P', monospace; font-size: 12px; color: #3a2e28; margin: 0 0 6px 0; letter-spacing: 2px; }
+        .receipt-header .receipt-subtitle { font-family: 'VT323', monospace; font-size: 20px; color: #6b5a3e; }
+        .receipt-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; font-family: 'VT323', monospace; font-size: 22px; }
+        .receipt-row .receipt-label { color: #5a4a35; }
+        .receipt-row .receipt-value { font-weight: bold; color: #3a2e28; }
+        .receipt-divider { border: none; border-top: 2px dashed #3a2e28; margin: 12px 0; }
+        .receipt-divider-bold { border: none; border-top: 4px solid #3a2e28; margin: 14px 0; }
+        .receipt-total-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; font-family: 'VT323', monospace; font-size: 26px; font-weight: bold; }
+        .receipt-status-badge {
+            display: inline-block; padding: 6px 14px; font-family: 'Press Start 2P', monospace; font-size: 8px;
+            border: 3px solid; letter-spacing: 1px;
+        }
+        .receipt-status-lunas { background: #85a67a; color: #1a2e14; border-color: #4c6145; }
+        .receipt-status-belum { background: #e8734a; color: #3a1510; border-color: #8a3f25; }
+        .receipt-overpay-notice {
+            background: rgba(58,46,40,0.08); border: 2px solid #8c6d2d; padding: 10px 14px;
+            margin-top: 12px; text-align: center;
+            font-family: 'VT323', monospace; font-size: 20px; color: #6b5a3e;
+        }
+        .receipt-overpay-notice i { color: #c08800; margin-right: 6px; }
+        .receipt-footer { text-align: center; margin-top: 18px; padding-top: 14px; border-top: 3px dashed #3a2e28; }
+        .receipt-footer p { font-family: 'VT323', monospace; font-size: 18px; color: #6b5a3e; margin: 4px 0; }
+        .receipt-btn-group { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+        .receipt-btn {
+            font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 14px 20px;
+            cursor: pointer; transition: all 0.1s; border: 4px solid #333;
+            box-shadow: 4px 4px 0 #000;
+        }
+        .receipt-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+        .receipt-btn-primary { background: #3a2e28; color: #f4e8d0; }
+        .receipt-btn-secondary { background: #d4a94a; color: #3a2e28; border-color: #8c6d2d; }
+        .receipt-services-list { padding-left: 8px; }
+        .receipt-services-list .service-item { font-family: 'VT323', monospace; font-size: 18px; color: #6b5a3e; font-style: italic; padding: 1px 0; }
+
         /* --- STYLE PIXEL ART CUSTOM MODAL SYSTEM --- */
         .pixel-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -100,17 +157,21 @@
                                 <span id="inv-val-total"></span>
                             </div>
                             <div id="inv-refund-row" class="flex justify-between text-2xl font-bold mt-2 hidden" style="color: #a74520;">
-                                <span>Refund/Kembalian:</span>
+                                <span>Refund Uang Muka:</span>
                                 <span id="inv-val-refund"></span>
                             </div>
                         </div>
                     </div>
 
                     <div class="mt-6">
-                        <label for="payment-amount" class="text-pixel block mb-3 uppercase" style="color: #3a2e28;">Uang Pembayaran</label>
+                        <label for="payment-amount" class="text-pixel block mb-3 uppercase" style="color: #3a2e28;">Dibayar Saat Checkout</label>
                         <input id="payment-amount" type="number" min="0" step="1000"
                             class="pixel-input w-full px-4 py-3 text-retro text-2xl"
                             style="background: #fffdf4; color: #3a2e28; border-color: #3a2e28;">
+                        <div id="overpay-warning" class="hidden mt-2 px-3 py-2 text-retro text-xl" style="background: rgba(192,136,0,0.15); border: 2px solid #c08800; color: #8c6d2d;">
+                            <i class="fa-solid fa-triangle-exclamation" style="color: #c08800;"></i>
+                            Kelebihan bayar — <strong>Tidak ada kembalian.</strong>
+                        </div>
                         <p id="checkout-error" class="hidden text-retro text-2xl font-bold mt-3 animate-pulse" style="color: #a74520;"></p>
                     </div>
 
@@ -124,6 +185,61 @@
             </div>
         </div>
     </main>
+
+    <!-- STRUK TRANSAKSI / RECEIPT OVERLAY -->
+    <div id="receipt-overlay" class="receipt-overlay">
+        <div class="receipt-panel">
+            <div class="receipt-header">
+                <h3>✦ STRUK TRANSAKSI ✦</h3>
+                <div class="receipt-subtitle">Monster Inn — Penginapan Dimensi</div>
+                <div id="receipt-trans-id" style="font-family: 'VT323', monospace; font-size: 16px; color: #8c6d2d; margin-top: 4px;"></div>
+            </div>
+
+            <div class="receipt-row"><span class="receipt-label">Nama Monster</span><span id="receipt-guest" class="receipt-value"></span></div>
+            <div class="receipt-row"><span class="receipt-label">Kamar</span><span id="receipt-room" class="receipt-value"></span></div>
+            <div class="receipt-row"><span class="receipt-label">Durasi Menginap</span><span id="receipt-stay" class="receipt-value"></span></div>
+
+            <hr class="receipt-divider">
+
+            <div class="receipt-row"><span class="receipt-label">Sewa Kamar</span><span id="receipt-room-total" class="receipt-value"></span></div>
+            <div class="receipt-row"><span class="receipt-label">Layanan Tambahan</span><span id="receipt-service-total" class="receipt-value"></span></div>
+            <div id="receipt-services-container" class="receipt-services-list"></div>
+
+            <hr class="receipt-divider-bold">
+
+            <div class="receipt-total-row"><span>Total Biaya</span><span id="receipt-total-cost"></span></div>
+            <div class="receipt-row" style="opacity: 0.7;"><span class="receipt-label">Uang Muka</span><span id="receipt-prepaid" class="receipt-value"></span></div>
+            <div class="receipt-total-row" style="color: #6b3a8a;"><span>Sisa Bayar</span><span id="receipt-remaining"></span></div>
+
+            <hr class="receipt-divider">
+
+            <div class="receipt-row"><span class="receipt-label">Dibayar Saat Checkout</span><span id="receipt-payment" class="receipt-value" style="color: #2d6b3a;"></span></div>
+            <div id="receipt-overpay-row" class="receipt-row hidden"><span class="receipt-label" style="color: #c08800;">Kelebihan Bayar</span><span id="receipt-overpay" class="receipt-value" style="color: #c08800;"></span></div>
+            <div class="receipt-row"><span class="receipt-label">Kembalian</span><span class="receipt-value">Rp 0</span></div>
+
+            <div id="receipt-overpay-notice" class="receipt-overpay-notice hidden">
+                <i class="fa-solid fa-info-circle"></i>
+                Pembayaran selesai. Tidak ada kembalian untuk pembayaran berlebih.
+            </div>
+
+            <hr class="receipt-divider">
+
+            <div style="text-align: center; margin: 12px 0;">
+                <span id="receipt-status" class="receipt-status-badge"></span>
+            </div>
+            <div id="receipt-time" class="receipt-row" style="justify-content: center; font-size: 18px; color: #8c6d2d;"></div>
+
+            <div class="receipt-footer">
+                <p>✦ Terima kasih telah menginap di Monster Inn ✦</p>
+                <p>Semoga perjalanan dimensi Anda menyenangkan!</p>
+            </div>
+
+            <div class="receipt-btn-group">
+                <button onclick="window.location.href='/laporan';" class="receipt-btn receipt-btn-primary">LIHAT LAPORAN ▶</button>
+                <button onclick="window.location.href='/checkout';" class="receipt-btn receipt-btn-secondary">CHECKOUT LAGI</button>
+            </div>
+        </div>
+    </div>
 
     <div id="custom-modal" class="pixel-modal-overlay">
         <div class="pixel-modal-box text-center">
@@ -204,6 +320,10 @@
             paymentInput.min = 0;
             paymentInput.disabled = latestGrandTotal === 0;
 
+            // CHECKOUT BILL NO CHANGE: live overpayment warning
+            paymentInput.addEventListener('input', updateOverpayWarning);
+            updateOverpayWarning();
+
             const refundRow = document.getElementById('inv-refund-row');
             document.getElementById('inv-val-refund').innerText = "Rp " + latestRefundAmount.toLocaleString('id-ID');
             refundRow.classList.toggle('hidden', latestRefundAmount <= 0);
@@ -260,6 +380,75 @@
             });
         }
 
+        function updateOverpayWarning() {
+            const paymentVal = Number(document.getElementById('payment-amount').value || 0);
+            const warningEl = document.getElementById('overpay-warning');
+            if (paymentVal > latestGrandTotal && latestGrandTotal > 0) {
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+        }
+
+        function formatRp(val) {
+            return 'Rp ' + Number(val || 0).toLocaleString('id-ID');
+        }
+
+        function showReceipt(data) {
+            document.getElementById('receipt-trans-id').innerText = data.transId || '';
+            document.getElementById('receipt-guest').innerText = data.guestName || '-';
+            document.getElementById('receipt-room').innerText = '#' + (data.roomId || '-');
+            document.getElementById('receipt-stay').innerText = (data.stayDays || 0) + ' Malam';
+            document.getElementById('receipt-room-total').innerText = formatRp(data.roomTotal);
+            document.getElementById('receipt-service-total').innerText = formatRp(data.serviceTotal);
+            document.getElementById('receipt-total-cost').innerText = formatRp(data.totalCost);
+            document.getElementById('receipt-prepaid').innerText = formatRp(data.prepaidAmount);
+            document.getElementById('receipt-remaining').innerText = formatRp(data.remainingDue);
+            document.getElementById('receipt-payment').innerText = formatRp(data.paymentAmount);
+
+            // Service log
+            const serviceContainer = document.getElementById('receipt-services-container');
+            if (data.serviceLog && data.serviceLog.length > 0) {
+                serviceContainer.innerHTML = data.serviceLog.map(s => `<div class="service-item">+ ${s}</div>`).join('');
+            } else {
+                serviceContainer.innerHTML = '<div class="service-item">Tanpa layanan tambahan</div>';
+            }
+
+            // Overpayment
+            const overpayAmount = Number(data.overpaymentAmount || 0);
+            const overpayRow = document.getElementById('receipt-overpay-row');
+            const overpayNotice = document.getElementById('receipt-overpay-notice');
+            if (overpayAmount > 0) {
+                document.getElementById('receipt-overpay').innerText = formatRp(overpayAmount);
+                overpayRow.classList.remove('hidden');
+                overpayNotice.classList.remove('hidden');
+            } else {
+                overpayRow.classList.add('hidden');
+                overpayNotice.classList.add('hidden');
+            }
+
+            // Status
+            const statusEl = document.getElementById('receipt-status');
+            if (data.paid) {
+                statusEl.innerText = '✦ LUNAS ✦';
+                statusEl.className = 'receipt-status-badge receipt-status-lunas';
+            } else {
+                statusEl.innerText = '⚠ BELUM LUNAS';
+                statusEl.className = 'receipt-status-badge receipt-status-belum';
+            }
+
+            // Checkout time
+            if (data.checkoutTime) {
+                const dt = new Date(data.checkoutTime);
+                const formatted = dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                    + ' — ' + dt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                document.getElementById('receipt-time').innerText = formatted;
+            }
+
+            // Show overlay
+            document.getElementById('receipt-overlay').classList.add('active');
+        }
+
         async function executeCheckoutBackend() {
             const guestId = selectedGuestId || document.getElementById('checkout-select').value;
             const paymentAmount = Number(document.getElementById('payment-amount').value || 0);
@@ -280,14 +469,8 @@
             const result = await res.json().catch(() => ({}));
             
             if(res.ok) {
-                openPixelModal({
-                    type: 'alert',
-                    title: '✦ CHECKOUT BERHASIL ✦',
-                    message: 'Struk transaksi diamankan! Monster telah terbang kembali dengan selamat menuju gerbang dimensi asal.',
-                    icon: 'fa-square-check',
-                    iconColor: '#85a67a',
-                    redirect: '/laporan' // REDIRECT OTOMATIS JALUR SAKTI MENU LAPORAN EXCEL
-                });
+                // CHECKOUT BILL NO CHANGE: tampilkan struk transaksi lengkap
+                showReceipt(result);
             } else {
                 errorEl.innerText = result.message || "Pembayaran kurang atau checkout gagal.";
                 errorEl.classList.remove('hidden');

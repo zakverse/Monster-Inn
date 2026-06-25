@@ -21,8 +21,8 @@ public class FireMonster extends Monster {
 
     @Override
     public double calculateTotalCost() {
-        // Total = (Base + Thermal) * Hari + Extra (Layanan)
-        return ((baseCost + thermalSurcharge) * stayDays) + extraCost;
+        // Total = Base * Hari + Extra (Layanan)
+        return ((baseCost * stayDays) + extraCost);
     }
 
 
