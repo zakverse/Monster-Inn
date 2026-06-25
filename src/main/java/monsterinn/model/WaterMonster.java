@@ -21,8 +21,8 @@ public class WaterMonster extends Monster {
 
     @Override
     public double calculateTotalCost() {
-        // Total = (Base + Filtrasi) * Hari + Extra (Layanan)
-        return ((baseCost + filtrationCost) * stayDays) + extraCost;
+        // Total = Base * Hari + Extra (Layanan)
+        return ((baseCost * stayDays) + extraCost);
     }
 
     @Override

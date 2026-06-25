@@ -31,6 +31,7 @@ public class Transaction {
     private double refundAmount;
     private double paymentAmount;
     private double changeAmount;
+    private double overpaymentAmount;
     private LocalDateTime checkoutTime;
 
     @ElementCollection
@@ -60,7 +61,9 @@ public class Transaction {
         this.refundAmount = Math.max(this.prepaidAmount - this.totalCost, 0);
         // FIX CHECKOUT PREPAID REFUND: pembayaran checkout tidak boleh negatif.
         this.paymentAmount = Math.max(paymentAmount, 0);
-        this.changeAmount = Math.max(this.paymentAmount - this.remainingDue, 0);
+        // CHECKOUT BILL NO CHANGE: kembalian selalu 0, kelebihan bayar hanya ditampilkan.
+        this.changeAmount = 0;
+        this.overpaymentAmount = Math.max(this.paymentAmount - this.remainingDue, 0);
         this.checkoutTime = LocalDateTime.now();
         this.serviceLog = new ArrayList<>(monster.getServiceLog());
         
@@ -79,7 +82,9 @@ public class Transaction {
     public boolean processPayment() {
         // FIX CHECKOUT PREPAID REFUND: lunas jika sisa bayar 0 atau pembayaran tambahan mencukupi.
         this.paymentAmount = Math.max(paymentAmount, 0);
-        this.changeAmount = Math.max(this.paymentAmount - this.remainingDue, 0);
+        // CHECKOUT BILL NO CHANGE: kembalian selalu 0, kelebihan bayar hanya ditampilkan.
+        this.changeAmount = 0;
+        this.overpaymentAmount = Math.max(this.paymentAmount - this.remainingDue, 0);
         this.paid = this.remainingDue == 0 || this.paymentAmount >= this.remainingDue;
         return paid;
     }

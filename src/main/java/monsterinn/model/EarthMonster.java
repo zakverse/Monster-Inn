@@ -21,8 +21,8 @@ public class EarthMonster extends Monster {
 
     @Override
     public double calculateTotalCost() {
-        // Total = (Base + Nutrisi) * Hari + Extra (Layanan)
-        return ((baseCost + soilNutrientCost) * stayDays) + extraCost;
+        // Total = Base * Hari + Extra (Layanan)
+        return ((baseCost * stayDays) + extraCost) ;
     }
 
     @Override

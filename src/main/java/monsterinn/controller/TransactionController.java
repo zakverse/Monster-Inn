@@ -142,9 +142,26 @@ public class TransactionController {
         // Hapus data monster dari tabel aktif hunian (Monsters)
         monsterRepo.delete(monster);
 
-        Map<String, String> response = new HashMap<>();
+        // CHECKOUT BILL NO CHANGE: kirim data struk transaksi lengkap ke frontend.
+        Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
         response.put("message", "Berhasil Checkout!");
+        response.put("transId", riwayatBaru.getTransId());
+        response.put("guestName", riwayatBaru.getGuestName());
+        response.put("roomId", riwayatBaru.getRoomId());
+        response.put("stayDays", riwayatBaru.getStayDays());
+        response.put("roomTotal", riwayatBaru.getRoomTotal());
+        response.put("serviceTotal", riwayatBaru.getServiceTotal());
+        response.put("prepaidAmount", riwayatBaru.getPrepaidAmount());
+        response.put("totalCost", riwayatBaru.getTotalCost());
+        response.put("remainingDue", riwayatBaru.getRemainingDue());
+        response.put("refundAmount", riwayatBaru.getRefundAmount());
+        response.put("paymentAmount", riwayatBaru.getPaymentAmount());
+        response.put("changeAmount", riwayatBaru.getChangeAmount());
+        response.put("overpaymentAmount", riwayatBaru.getOverpaymentAmount());
+        response.put("paid", riwayatBaru.isPaid());
+        response.put("checkoutTime", riwayatBaru.getCheckoutTime() != null ? riwayatBaru.getCheckoutTime().toString() : null);
+        response.put("serviceLog", riwayatBaru.getServiceLog());
         return ResponseEntity.ok(response);
     }
 }
