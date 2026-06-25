@@ -164,4 +164,15 @@ public class TransactionController {
         response.put("serviceLog", riwayatBaru.getServiceLog());
         return ResponseEntity.ok(response);
     }
+
+    // 4. API untuk Menampilkan Halaman Cetak Struk
+    @GetMapping("/struk/{id}")
+    public String showReceiptPage(@PathVariable String id, Model model) {
+        Transaction transaction = transactionRepo.findById(id).orElse(null);
+        if (transaction == null) {
+            return "redirect:/laporan";
+        }
+        model.addAttribute("transaction", transaction);
+        return "view/struk";
+    }
 }

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+    <title th:text="'Struk Transaksi - ' + ${transaction.transId}">Struk Transaksi</title>
+    <style>
+        body { 
+            background: #e8d5b0; 
+            color: #1a1a1a; 
+            font-family: 'VT323', monospace; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            padding: 40px 20px;
+        }
+        .receipt-container {
+            background: #fff;
+            width: 400px;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        /* Top jagged edge */
+        .receipt-container::before {
+            content: "";
+            position: absolute;
+            top: -10px; left: 0; right: 0; height: 10px;
+            background: linear-gradient(-45deg, #fff 5px, transparent 0), linear-gradient(45deg, #fff 5px, transparent 0);
+            background-size: 10px 10px;
+        }
+        /* Bottom jagged edge */
+        .receipt-container::after {
+            content: "";
+            position: absolute;
+            bottom: -10px; left: 0; right: 0; height: 10px;
+            background: linear-gradient(-45deg, transparent 5px, #fff 0), linear-gradient(45deg, transparent 5px, #fff 0);
+            background-size: 10px 10px;
+        }
+        .text-pixel { font-family: 'Press Start 2P', monospace; }
+        
+        .header { text-align: center; border-bottom: 2px dashed #1a1a1a; padding-bottom: 15px; margin-bottom: 15px; }
+        .header h1 { font-size: 16px; margin: 0 0 10px 0; }
+        .header p { font-size: 20px; margin: 0; }
+        .header .trans-id { font-size: 16px; margin-top: 5px; color: #555; }
+        
+        .row { display: flex; justify-content: space-between; font-size: 20px; margin-bottom: 5px; }
+        .label { color: #444; }
+        .value { font-weight: bold; text-align: right; }
+        
+        .divider { border-top: 2px dashed #1a1a1a; margin: 15px 0; }
+        .divider-solid { border-top: 3px solid #1a1a1a; margin: 15px 0; }
+        
+        .total-row { font-size: 24px; font-weight: bold; }
+        
+        .service-list { padding-left: 10px; font-size: 18px; color: #444; font-style: italic; }
+        
+        .status-badge {
+            display: inline-block; padding: 5px 10px; font-size: 12px; margin-top: 15px;
+            border: 2px solid #1a1a1a; font-family: 'Press Start 2P', monospace;
+        }
+        
+        .footer { text-align: center; font-size: 18px; margin-top: 25px; border-top: 2px dashed #1a1a1a; padding-top: 15px; }
+        
+        .no-print { margin-top: 30px; text-align: center; }
+        .btn-print {
+            font-family: 'Press Start 2P', monospace; font-size: 12px; padding: 15px 25px;
+            background: #3a2e28; color: #fff; border: 4px solid #000; cursor: pointer;
+            box-shadow: 4px 4px 0 #000; transition: all 0.1s;
+        }
+        .btn-print:active { transform: translate(2px, 2px); box-shadow: none; }
+        .btn-back {
+            font-family: 'Press Start 2P', monospace; font-size: 10px; padding: 10px 15px;
+            background: transparent; color: #3a2e28; border: none; cursor: pointer;
+            text-decoration: underline; margin-top: 15px; display: inline-block;
+        }
+        
+        @media print {
+            body { background: #fff; padding: 0; display: block; }
+            .receipt-container { width: 100%; box-shadow: none; padding: 0; margin: 0; }
+            .receipt-container::before, .receipt-container::after { display: none; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="receipt-container">
+            <div class="header">
+                <h1 class="text-pixel">MONSTER INN</h1>
+                <p>Penginapan Dimensi</p>
+                <div class="trans-id" th:text="${transaction.transId}">TX-123456</div>
+                <div style="font-size: 16px; margin-top: 5px;" th:text="${#temporals.format(transaction.checkoutTime, 'dd MMM yyyy - HH:mm')}">01 Jan 2024 - 12:00</div>
+            </div>
+            
+            <div class="row"><span class="label">Nama Monster</span><span class="value" th:text="${transaction.guestName}">Guest</span></div>
+            <div class="row"><span class="label">Elemen</span><span class="value" th:text="${transaction.element}">FIRE</span></div>
+            <div class="row"><span class="label">Kamar</span><span class="value" th:text="'#' + ${transaction.roomId}">Room</span></div>
+            <div class="row"><span class="label">Durasi Menginap</span><span class="value" th:text="${transaction.stayDays} + ' Malam'">0 Malam</span></div>
+            
+            <div class="divider"></div>
+            
+            <div class="row"><span class="label">Sewa Kamar</span><span class="value" th:text="'Rp ' + ${#numbers.formatDecimal(transaction.roomTotal, 0, 'POINT', 0, 'COMMA')}">Rp 0</span></div>
+            <div class="row"><span class="label">Layanan Tambahan</span><span class="value" th:text="'Rp ' + ${#numbers.formatDecimal(transaction.serviceTotal, 0, 'POINT', 0, 'COMMA')}">Rp 0</span></div>
+            <div class="service-list">
+                <div th:each="service : ${transaction.serviceLog}" th:text="'+ ' + ${service}">+ Layanan</div>
+                <div th:if="${#lists.isEmpty(transaction.serviceLog)}">Tanpa layanan tambahan</div>
+            </div>
+            
+            <div class="divider-solid"></div>
+            
+            <div class="row total-row"><span class="label">Total Biaya</span><span class="value" th:text="'Rp ' + ${#numbers.formatDecimal(transaction.totalCost, 0, 'POINT', 0, 'COMMA')}">Rp 0</span></div>
+            <div class="row"><span class="label">Uang Muka</span><span class="value" th:text="'Rp ' + ${#numbers.formatDecimal(transaction.prepaidAmount, 0, 'POINT', 0, 'COMMA')}">Rp 0</span></div>
+            <div class="row total-row" style="margin-top: 10px;"><span class="label">Sisa Bayar</span><span class="value" th:text="'Rp ' + ${#numbers.formatDecimal(transaction.remainingDue, 0, 'POINT', 0, 'COMMA')}">Rp 0</span></div>
+            
+            <div class="divider"></div>
+            
+            <div class="row"><span class="label">Dibayar</span><span class="value" th:text="'Rp ' + ${#numbers.formatDecimal(transaction.paymentAmount, 0, 'POINT', 0, 'COMMA')}">Rp 0</span></div>
+            
+            <div th:if="${transaction.overpaymentAmount > 0}" class="row" style="color: #666;">
+                <span class="label">Kelebihan Bayar</span><span class="value" th:text="'Rp ' + ${#numbers.formatDecimal(transaction.overpaymentAmount, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+            </div>
+            
+            <div style="text-align: center;">
+                <span th:if="${transaction.paid}" class="status-badge" style="border-color: #1a2e14; color: #1a2e14; background: #e8eedf;">LUNAS</span>
+                <span th:unless="${transaction.paid}" class="status-badge" style="border-color: #8a3f25; color: #8a3f25; background: #fdf2ee;">BELUM LUNAS</span>
+            </div>
+            
+            <div class="footer">
+                <p>Terima kasih telah menginap<br>di Monster Inn</p>
+            </div>
+        </div>
+        
+        <div class="no-print">
+            <button class="btn-print" onclick="window.print()">🖨️ CETAK STRUK</button>
+            <br>
+            <a href="/laporan" class="btn-back">KEMBALI KE LAPORAN</a>
+        </div>
+    </div>
+</body>
+</html>

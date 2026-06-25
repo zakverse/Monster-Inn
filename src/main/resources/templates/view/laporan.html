@@ -102,6 +102,14 @@
                             <span th:text="'Kamar ' + ${t.roomId}">Kamar</span>
                             <span th:text="'Rp ' + ${#numbers.formatDecimal(t.calculateTotalCost(), 0, 'POINT', 0, 'COMMA')}">Harga</span>
                         </div>
+                        <div class="mt-2 text-right">
+                            <a th:href="@{/struk/{id}(id=${t.transId})}" target="_blank" class="text-pixel cursor-pointer inline-block text-center" 
+                                style="text-decoration: none; font-size: 6px; background: #8c6d2d; border: 2px solid #3a2e28; color: #f4e8d0; padding: 4px 8px; box-shadow: 2px 2px 0 #000; transition: all 0.1s;"
+                                onmouseover="this.style.transform='translate(-1px,-1px)'; this.style.boxShadow='3px 3px 0 #000';"
+                                onmouseout="this.style.transform='none'; this.style.boxShadow='2px 2px 0 #000';">
+                                LIHAT STRUK
+                            </a>
+                        </div>
                     </div>
 
                     <div th:if="${#lists.isEmpty(history)}" class="text-center py-10" style="opacity: 0.3;">

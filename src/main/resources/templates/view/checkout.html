@@ -234,7 +234,8 @@
                 <p>Semoga perjalanan dimensi Anda menyenangkan!</p>
             </div>
 
-            <div class="receipt-btn-group">
+            <div class="receipt-btn-group" style="flex-wrap: wrap;">
+                <button onclick="window.open('/struk/' + document.getElementById('receipt-trans-id').innerText, '_blank');" class="receipt-btn" style="background: #85a67a; color: #1a2e14; border-color: #4c6145;">🖨️ CETAK STRUK</button>
                 <button onclick="window.location.href='/laporan';" class="receipt-btn receipt-btn-primary">LIHAT LAPORAN ▶</button>
                 <button onclick="window.location.href='/checkout';" class="receipt-btn receipt-btn-secondary">CHECKOUT LAGI</button>
             </div>
